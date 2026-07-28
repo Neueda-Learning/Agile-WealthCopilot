@@ -20,14 +20,16 @@ Protect `main` with these settings:
 1. Require a pull request before merging.
 2. Require at least one approving review.
 3. Dismiss stale approvals when new commits are pushed.
-4. Require status checks to pass before merging.
-5. Require the `build-and-test` check from the `Backend CI` workflow.
-6. Require branches to be up to date before merging.
-7. Block force pushes and branch deletion.
-8. Apply the rule to administrators where organization policy permits it.
+4. Keep the `Backend CI` workflow running on every PR for visibility.
+5. The current relaxed setting does not make `build-and-test` a required merge
+   check; restore that requirement when the team is ready for strict CI gating.
+6. Block force pushes and branch deletion.
+7. Apply the rule to administrators where organization policy permits it.
 
 The workflow is defined in `.github/workflows/backend-ci.yml` and runs
-`./mvnw verify`, including the Testcontainers MySQL integration tests.
+`./mvnw verify`, including the Testcontainers MySQL integration tests. It still
+reports pass/fail on every PR, but the relaxed branch rule currently permits a
+merge after the required review even if that check fails.
 
 ## Pull request policy
 
