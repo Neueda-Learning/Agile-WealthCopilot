@@ -1,0 +1,52 @@
+/* ── WealthCopilot color system ────────────────────────────────────────────
+   Base scales first, semantic aliases second. Only use semantic aliases in
+   components; base scales exist so semantics can be re-pointed. */
+:root{
+  /* Ink / neutral scale — cool-leaning slate, never pure black */
+  --ink-950:#0b1220; --ink-900:#101a2c; --ink-800:#1b2740; --ink-700:#2c3a55;
+  --ink-600:#455270; --ink-500:#61708c; --ink-400:#8b98af; --ink-300:#b6c0d0;
+  --ink-200:#d9dfe8; --ink-100:#e9edf3; --ink-50:#f4f6fa; --ink-0:#ffffff;
+
+  /* Brand — Copilot Blue. Confident, financial, non-purple. */
+  --blue-900:#0f2a75; --blue-800:#163a9e; --blue-700:#1c47c4; --blue-600:#1f4fd8;
+  --blue-500:#3a67e6; --blue-400:#7192f0; --blue-300:#adc0f7; --blue-200:#d7e0fc; --blue-100:#eef2fe;
+
+  /* Market signal — gain */
+  --gain-700:#0a6b46; --gain-600:#0e8f5e; --gain-500:#17a86f; --gain-200:#c2ead9; --gain-100:#e8f7f0;
+  /* Market signal — loss */
+  --loss-700:#98261e; --loss-600:#c8372d; --loss-500:#dc4a3f; --loss-200:#f6cfcb; --loss-100:#fdeceb;
+  /* Caution */
+  --amber-700:#8a5504; --amber-600:#b4700a; --amber-200:#f5dfb5; --amber-100:#fdf4e3;
+
+  /* ── Semantic aliases ── */
+  --text-primary:var(--ink-950);
+  --text-body:var(--ink-800);
+  --text-secondary:var(--ink-600);
+  --text-muted:var(--ink-500);
+  --text-disabled:var(--ink-400);
+  --text-inverse:var(--ink-0);
+  --text-brand:var(--blue-700);
+  --text-gain:var(--gain-700);
+  --text-loss:var(--loss-700);
+
+  --surface-page:var(--ink-50);
+  --surface-card:var(--ink-0);
+  --surface-sunken:var(--ink-100);
+  --surface-inverse:var(--ink-950);
+  --surface-brand:var(--blue-600);
+  --surface-brand-soft:var(--blue-100);
+  --surface-gain-soft:var(--gain-100);
+  --surface-loss-soft:var(--loss-100);
+  --surface-caution-soft:var(--amber-100);
+  --surface-hover:var(--ink-50);
+  --surface-active:var(--ink-100);
+
+  --border-subtle:var(--ink-100);
+  --border-default:var(--ink-200);
+  --border-strong:var(--ink-300);
+  --border-brand:var(--blue-600);
+  --border-focus:var(--blue-500);
+
+  --chart-1:var(--blue-600); --chart-2:#17a86f; --chart-3:#b4700a;
+  --chart-4:#5b6bd6; --chart-5:#0e7490; --chart-6:#8b98af;
+}

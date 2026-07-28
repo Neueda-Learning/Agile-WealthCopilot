@@ -1,0 +1,19 @@
+/* 4px base grid. Density is "compact-comfortable": data tables breathe less
+   than marketing surfaces, but never below 8px of internal padding. */
+:root{
+  --space-0:0px; --space-1:2px; --space-2:4px; --space-3:8px; --space-4:12px;
+  --space-5:16px; --space-6:20px; --space-7:24px; --space-8:32px; --space-9:40px;
+  --space-10:48px; --space-11:64px; --space-12:80px;
+
+  --card-padding:20px;
+  --card-padding-compact:16px;
+  --section-gap:24px;
+  --page-padding:32px;
+  --row-height:48px; /* @kind spacing */
+  --row-height-compact:40px; /* @kind spacing */
+  --control-height-sm:30px; /* @kind spacing */
+  --control-height-md:38px; /* @kind spacing */
+  --control-height-lg:46px; /* @kind spacing */
+  --sidebar-width:236px; /* @kind spacing */
+  --content-max:1240px; /* @kind spacing */
+}

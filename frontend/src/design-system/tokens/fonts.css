@@ -1,0 +1,6 @@
+/* WealthCopilot webfonts.
+   SUBSTITUTION NOTE: no brand font files were supplied. Public Sans (UI/display)
+   and IBM Plex Mono (tabular numerics, tickers) are Google Fonts stand-ins chosen
+   for their true tabular figures and neutral, institutional tone.
+   Swap the @import below for local @font-face rules when real files arrive. */
+@import url("https://fonts.googleapis.com/css2?family=Public+Sans:ital,wght@0,300..800;1,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap");
