@@ -7,7 +7,6 @@ import com.wealthcopilot.entity.Transaction;
 import com.wealthcopilot.entity.TransactionSource;
 import com.wealthcopilot.exception.DomainValidationException;
 import com.wealthcopilot.exception.ResourceNotFoundException;
-import com.wealthcopilot.repository.InstrumentRepository;
 import com.wealthcopilot.repository.TransactionRepository;
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -21,16 +20,16 @@ import org.springframework.transaction.annotation.Transactional;
 public class TransactionService {
 
     private final TransactionRepository transactionRepository;
-    private final InstrumentRepository instrumentRepository;
+    private final InstrumentResolutionService instrumentResolutionService;
     private final TransactionTimelineValidator timelineValidator;
 
     public TransactionService(
             TransactionRepository transactionRepository,
-            InstrumentRepository instrumentRepository,
+            InstrumentResolutionService instrumentResolutionService,
             TransactionTimelineValidator timelineValidator
     ) {
         this.transactionRepository = transactionRepository;
-        this.instrumentRepository = instrumentRepository;
+        this.instrumentResolutionService = instrumentResolutionService;
         this.timelineValidator = timelineValidator;
     }
 
@@ -74,7 +73,7 @@ public class TransactionService {
     @CacheEvict(cacheNames = {"portfolioSummary", "portfolioHoldings"}, key = "#userId")
     public TransactionResponse createTransaction(Long userId, TransactionUpsertRequest request) {
         validateRequest(request);
-        Instrument instrument = resolveUsdInstrument(request.ticker());
+        Instrument instrument = instrumentResolutionService.resolveUsdInstrument(request.ticker());
 
         Transaction tx = new Transaction();
         tx.setUserId(userId);
@@ -103,7 +102,7 @@ public class TransactionService {
     @CacheEvict(cacheNames = {"portfolioSummary", "portfolioHoldings"}, key = "#userId")
     public TransactionResponse updateTransaction(Long userId, Long transactionId, TransactionUpsertRequest request) {
         validateRequest(request);
-        Instrument instrument = resolveUsdInstrument(request.ticker());
+        Instrument instrument = instrumentResolutionService.resolveUsdInstrument(request.ticker());
 
         Transaction existing = transactionRepository.findByIdAndUserId(transactionId, userId)
                 .orElseThrow(() -> new ResourceNotFoundException("transaction not found"));
@@ -207,15 +206,6 @@ public class TransactionService {
         if (request.tradeDate() == null) {
             throw new DomainValidationException("tradeDate is required");
         }
-    }
-
-    private Instrument resolveUsdInstrument(String ticker) {
-        Instrument instrument = instrumentRepository.findByTickerIgnoreCase(ticker)
-                .orElseThrow(() -> new DomainValidationException("unknown ticker: " + ticker));
-        if (!"USD".equalsIgnoreCase(instrument.getCurrency())) {
-            throw new DomainValidationException("only USD instruments supported in v1");
-        }
-        return instrument;
     }
 
     private TransactionResponse toResponse(Transaction tx) {

@@ -3,10 +3,10 @@ package com.wealthcopilot.exception;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
-@ResponseStatus(HttpStatus.NOT_FOUND)
-public class ResourceNotFoundException extends RuntimeException {
+@ResponseStatus(HttpStatus.SERVICE_UNAVAILABLE)
+public class MarketDataUnavailableException extends RuntimeException {
 
-    public ResourceNotFoundException(String message) {
+    public MarketDataUnavailableException(String message) {
         super(message);
     }
 }
