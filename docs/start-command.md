@@ -1,0 +1,2 @@
+cd C:\Users\Administrator\Desktop\Agile-WealthCopilot\backend
+mvn spring-boot:run "-Dspring-boot.run.arguments=--spring.flyway.enabled=false --spring.datasource.url=jdbc:h2:mem:wealthcopilot;MODE=MySQL;DATABASE_TO_LOWER=TRUE --spring.datasource.driverClassName=org.h2.Driver --spring.datasource.username=sa --spring.datasource.password= --spring.jpa.hibernate.ddl-auto=update --spring.h2.console.enabled=true --server.port=8080"
