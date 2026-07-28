@@ -12,7 +12,10 @@ import com.wealthcopilot.entity.ApiKeyScope;
 import com.wealthcopilot.entity.Instrument;
 import com.wealthcopilot.entity.InstrumentType;
 import com.wealthcopilot.entity.PriceCache;
+import com.wealthcopilot.entity.Transaction;
+import com.wealthcopilot.entity.TransactionSide;
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,6 +36,9 @@ class MarketDataPersistenceTest {
 
     @Autowired
     private ApiKeyRepository apiKeyRepository;
+
+    @Autowired
+    private TransactionRepository transactionRepository;
 
     @Test
     void priceCache_usesInstrumentAsPrimaryKeyAndPreservesQuoteFields() {
@@ -92,6 +98,20 @@ class MarketDataPersistenceTest {
         );
     }
 
+    @Test
+    void currentlyHeldInstruments_excludesClosedPositions() {
+        Instrument closed = saveInstrument("AAPL");
+        Instrument held = saveInstrument("NVDA");
+        transactionRepository.save(transaction(closed, TransactionSide.BUY, "2"));
+        transactionRepository.save(transaction(closed, TransactionSide.SELL, "2"));
+        transactionRepository.saveAndFlush(transaction(held, TransactionSide.BUY, "1.5"));
+
+        var instruments = transactionRepository.findAllCurrentlyHeldInstruments();
+
+        assertEquals(1, instruments.size());
+        assertEquals("NVDA", instruments.get(0).getTicker());
+    }
+
     private Instrument saveInstrument(String ticker) {
         Instrument instrument = new Instrument();
         instrument.setTicker(ticker);
@@ -107,5 +127,16 @@ class MarketDataPersistenceTest {
         apiKey.setKeyHash(keyHash);
         apiKey.setLabel(label);
         return apiKey;
+    }
+
+    private Transaction transaction(Instrument instrument, TransactionSide side, String quantity) {
+        Transaction transaction = new Transaction();
+        transaction.setUserId(1L);
+        transaction.setInstrument(instrument);
+        transaction.setSide(side);
+        transaction.setQuantity(new BigDecimal(quantity));
+        transaction.setPrice(new BigDecimal("100.0000"));
+        transaction.setTradeDate(LocalDate.of(2026, 7, 28));
+        return transaction;
     }
 }

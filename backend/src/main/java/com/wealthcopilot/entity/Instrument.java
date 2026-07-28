@@ -49,6 +49,10 @@ public class Instrument {
         return id;
     }
 
+    public void setId(Long id) {
+        this.id = id;
+    }
+
     public String getTicker() {
         return ticker;
     }
