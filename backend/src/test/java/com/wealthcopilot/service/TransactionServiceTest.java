@@ -18,7 +18,6 @@ import com.wealthcopilot.entity.TransactionSide;
 import com.wealthcopilot.entity.TransactionSource;
 import com.wealthcopilot.exception.DomainValidationException;
 import com.wealthcopilot.exception.ResourceNotFoundException;
-import com.wealthcopilot.repository.InstrumentRepository;
 import com.wealthcopilot.repository.TransactionRepository;
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -39,7 +38,7 @@ class TransactionServiceTest {
     private TransactionRepository transactionRepository;
 
     @Mock
-    private InstrumentRepository instrumentRepository;
+    private InstrumentResolutionService instrumentResolutionService;
 
     @Mock
     private TransactionTimelineValidator timelineValidator;
@@ -53,7 +52,7 @@ class TransactionServiceTest {
         Instrument instrument = instrument("NVDA", "USD");
         Transaction existing = tx(1L, userId, instrument, TransactionSide.BUY, "10", "100", "0", "2026-01-01");
 
-        when(instrumentRepository.findByTickerIgnoreCase("NVDA")).thenReturn(Optional.of(instrument));
+        when(instrumentResolutionService.resolveUsdInstrument("NVDA")).thenReturn(instrument);
         when(transactionRepository.findAllByUserIdOrderByTradeDateAscIdAsc(userId)).thenReturn(new ArrayList<>(List.of(existing)));
         when(transactionRepository.save(any(Transaction.class))).thenAnswer(invocation -> {
             Transaction saved = invocation.getArgument(0);
@@ -87,7 +86,8 @@ class TransactionServiceTest {
 
     @Test
     void createTransaction_throwsWhenTickerUnknown() {
-        when(instrumentRepository.findByTickerIgnoreCase("NOPE")).thenReturn(Optional.empty());
+        when(instrumentResolutionService.resolveUsdInstrument("NOPE"))
+                .thenThrow(new DomainValidationException("unknown ticker: NOPE"));
 
         TransactionUpsertRequest request = new TransactionUpsertRequest(
                 "NOPE",
@@ -111,7 +111,8 @@ class TransactionServiceTest {
 
     @Test
     void createTransaction_throwsWhenInstrumentCurrencyNotUsd() {
-        when(instrumentRepository.findByTickerIgnoreCase("TSM")).thenReturn(Optional.of(instrument("TSM", "TWD")));
+        when(instrumentResolutionService.resolveUsdInstrument("TSM"))
+                .thenThrow(new DomainValidationException("only USD instruments supported in v1"));
 
         TransactionUpsertRequest request = new TransactionUpsertRequest(
                 "TSM",
@@ -135,7 +136,7 @@ class TransactionServiceTest {
 
     @Test
     void updateTransaction_throwsWhenTargetMissing() {
-        when(instrumentRepository.findByTickerIgnoreCase("NVDA")).thenReturn(Optional.of(instrument("NVDA", "USD")));
+        when(instrumentResolutionService.resolveUsdInstrument("NVDA")).thenReturn(instrument("NVDA", "USD"));
         when(transactionRepository.findByIdAndUserId(99L, 1L)).thenReturn(Optional.empty());
 
         TransactionUpsertRequest request = new TransactionUpsertRequest(
