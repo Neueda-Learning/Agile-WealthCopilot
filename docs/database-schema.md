@@ -124,6 +124,11 @@ Instructor / external read-only access.
 
 | Migration | Contents |
 |---|---|
-| V1__baseline.sql | users, instruments, transactions, price_cache |
-| V2__ai_chat.sql | conversations, chat_messages |
-| V3__external_api.sql | api_keys |
+| V1__baseline.sql | users (Simon, S4) |
+| V2__transactions.sql | instruments, transactions (Ezio, E1) |
+| V3__price_cache.sql | price_cache (Tony, T1) |
+| V4__ai_chat.sql | conversations, chat_messages (Jasper, J15) |
+| V5__external_api.sql | api_keys (Tony, T1/T6) |
+
+Migration files are immutable after they have been shared. Each owner adds a
+new, forward-only migration rather than editing an existing migration.
