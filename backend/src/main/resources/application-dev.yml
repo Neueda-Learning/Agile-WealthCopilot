@@ -1,0 +1,11 @@
+app:
+  cors:
+    allowed-origins:
+      - ${FRONTEND_ORIGIN:http://localhost:5173}
+  security:
+    jwt:
+      secret: ${JWT_SECRET:wealthcopilot-dev-only-secret-change-me-2026}
+
+spring:
+  jpa:
+    show-sql: false

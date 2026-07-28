@@ -1,0 +1,10 @@
+spring:
+  jpa:
+    show-sql: false
+  flyway:
+    clean-disabled: true
+
+app:
+  security:
+    jwt:
+      secret: wealthcopilot-test-secret-at-least-32-bytes
