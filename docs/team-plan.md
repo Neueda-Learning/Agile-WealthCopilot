@@ -107,25 +107,6 @@ before the agent is attempted.
 
 ---
 
-## Load balance — read this before committing to it
-
-Jasper holds 18 of the project's 46 tasks, including both spec-mandated
-headline features plus every screen — roughly 40% of the work on one person,
-in 3 days. Three things keep it viable:
-
-1. **Simon, Ezio and Tony each publish interfaces on day 1.** Jasper builds
-   against stubs and is never blocked waiting for a backend endpoint.
-2. **E8 exists specifically to serve Jasper.** Ezio writes the per-tool service
-   methods so the agent layer is thin glue, not re-implemented business logic.
-3. **A pre-agreed hand-off, decided now rather than in a panic on day 3.** If
-   Feature 1 (J9–J12) has not shipped by the end of day 2:
-   - **Tony takes J9 (`LlmClient`)** — same external-HTTP-client shape as T2,
-     and Tony already owns the stubs.
-   - **Simon takes J14 (tool-calling loop)** — Simon owns the user-scoping
-     convention and is already reviewing it for boundary correctness.
-
-   That leaves Jasper the UI and prompt work, which no one else can absorb cheaply.
-
 ## Cut line for 3 days
 
 If the schedule slips, drop in this order — everything below the line is
