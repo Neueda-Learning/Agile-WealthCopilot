@@ -38,3 +38,7 @@ pnpm-debug.log*
 # Logs
 logs/
 *.log
+
+# Frontend build output and deps
+frontend/node_modules/
+frontend/dist/

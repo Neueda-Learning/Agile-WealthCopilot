@@ -1,0 +1,59 @@
+<!-- @dsCard group="Web app" viewport="1440x900" name="WealthCopilot web app" subtitle="Dashboard, holdings, AI transaction logging and the read-only Copilot chat" -->
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><title>WealthCopilot — web app</title>
+<link rel="stylesheet" href="../../styles.css">
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script src="../../_ds_bundle.js"></script>
+<script src="./data.js"></script>
+<style>html,body,#root{height:100%}body{margin:0;overflow:hidden}</style>
+</head><body><div id="root"></div>
+<script type="text/babel" src="./AppShell.jsx"></script>
+<script type="text/babel" src="./DashboardScreen.jsx"></script>
+<script type="text/babel" src="./HoldingsScreen.jsx"></script>
+<script type="text/babel" src="./LogTransactionScreen.jsx"></script>
+<script type="text/babel" src="./CopilotScreen.jsx"></script>
+<script type="text/babel">
+const { Button, IconButton, Badge } = window.WealthCopilotDesignSystem_f10604;
+
+const TITLES = {
+  dashboard: ['Dashboard', 'Updated 4:02pm ET · Jul 27, 2026'],
+  holdings: ['Holdings', '8 positions across 3 accounts'],
+  transactions: ['Holdings', '8 positions across 3 accounts'],
+  log: ['Log transaction', 'Describe it, review it, save it'],
+  chat: ['Ask Copilot', 'Read-only portfolio assistant']
+};
+
+function App() {
+  const [view, setView] = React.useState('dashboard');
+  const [tab, setTab] = React.useState('holdings');
+  const [seed, setSeed] = React.useState(null);
+  const [saved, setSaved] = React.useState(null);
+
+  const goHoldings = function () { setView('holdings'); setTab('holdings'); };
+  const ask = function (q) { setSeed(q); setView('chat'); };
+
+  const t = TITLES[view];
+  const actions = view === 'chat' ? (
+    <Button variant="secondary" size="sm" iconLeft="rotate-ccw" onClick={function () { setSeed(null); setView('chat'); }}>New chat</Button>
+  ) : (
+    <>
+      <IconButton icon="refresh-cw" label="Refresh prices" bordered />
+      <Button size="sm" iconLeft="plus" onClick={function () { setView('log'); }}>Log transaction</Button>
+    </>
+  );
+
+  return (
+    <window.AppShell active={view} onNavigate={function (id) { if (id === 'transactions') { setView('holdings'); setTab('transactions'); } else setView(id); }}
+      title={t[0]} subtitle={t[1]} actions={actions}>
+      {view === 'dashboard' ? <window.DashboardScreen onOpenHolding={goHoldings} onAsk={ask} /> : null}
+      {view === 'holdings' ? <window.HoldingsScreen tab={tab} onTab={setTab} /> : null}
+      {view === 'log' ? <window.LogTransactionScreen saved={saved} onSaved={setSaved} /> : null}
+      {view === 'chat' ? <window.CopilotScreen key={seed || 'blank'} seed={seed} /> : null}
+    </window.AppShell>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+</script>
+</body></html>

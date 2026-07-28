@@ -1,0 +1,15 @@
+/* Minimal base layer. Components carry their own styles inline/scoped;
+   this only sets the page ground truth. */
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--surface-page);color:var(--text-body);font-family:var(--font-sans);font-size:var(--fs-body);line-height:var(--lh-body);-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+h1,h2,h3,h4,p,figure{margin:0}
+h1,h2,h3,h4{color:var(--text-primary);font-weight:var(--fw-semibold)}
+a{color:var(--text-brand);text-decoration:none}
+a:hover{color:var(--blue-800);text-decoration:underline;text-underline-offset:2px}
+a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,[tabindex]:focus-visible{outline:2px solid var(--border-focus);outline-offset:2px}
+button,input,select,textarea{font:inherit;color:inherit}
+::selection{background:var(--blue-200)}
+/* Every number in the product: tabular, lining, slashed zero. */
+.wc-num{font-family:var(--font-mono);font-variant-numeric:tabular-nums lining-nums slashed-zero;font-feature-settings:var(--num-features)}
+.wc-label{font-size:var(--fs-xs);line-height:var(--lh-xs);letter-spacing:var(--ls-xs);text-transform:uppercase;font-weight:var(--fw-semibold);color:var(--text-muted)}

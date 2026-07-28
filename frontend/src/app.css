@@ -1,0 +1,64 @@
+/* App-level layout only. Anything that looks like a component belongs in the
+   design system, not here. */
+
+html, body, #root { height: 100%; }
+
+.app-shell { display: flex; height: 100%; background: var(--surface-page); }
+.app-main { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+.app-scroll { flex: 1; overflow-y: auto; padding: var(--page-padding); }
+.app-content { max-width: var(--content-max); margin: 0 auto; }
+
+.stack { display: flex; flex-direction: column; gap: var(--section-gap); }
+.stack-sm { display: flex; flex-direction: column; gap: var(--space-5); }
+.row { display: flex; align-items: center; gap: var(--space-4); }
+.row-end { display: flex; align-items: flex-end; gap: var(--space-4); }
+.spacer { flex: 1; }
+
+.grid-2 { display: grid; grid-template-columns: 2fr 1fr; gap: var(--section-gap); }
+.grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: var(--space-5); }
+
+@media (max-width: 900px) {
+  .grid-2, .grid-3 { grid-template-columns: 1fr; }
+}
+
+/* Centred card for login / register. */
+.auth-page {
+  min-height: 100%;
+  display: flex; align-items: center; justify-content: center;
+  padding: var(--space-8);
+  background: var(--surface-page);
+}
+.auth-card { width: 100%; max-width: 400px; }
+
+.account-chip {
+  display: flex; align-items: center; gap: var(--space-4);
+  padding: var(--space-4);
+  border-top: 1px solid var(--border-subtle);
+}
+.account-chip__avatar {
+  display: flex; align-items: center; justify-content: center;
+  width: 28px; height: 28px; border-radius: var(--radius-pill);
+  background: var(--surface-inverse); color: var(--ink-0);
+  font-size: 12px; font-weight: var(--fw-semibold);
+}
+
+/* Ticker search-as-you-type results. */
+.ticker-search { position: relative; }
+.ticker-search__menu {
+  position: absolute; top: calc(100% + 4px); left: 0; right: 0; z-index: 20;
+  background: var(--surface-card);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-control);
+  box-shadow: var(--shadow-sm);
+  max-height: 260px; overflow-y: auto;
+}
+.ticker-search__item {
+  display: flex; align-items: center; gap: var(--space-4);
+  width: 100%; padding: var(--space-3) var(--space-4);
+  border: 0; background: transparent; cursor: pointer; text-align: left;
+}
+.ticker-search__item:hover, .ticker-search__item[data-active="true"] {
+  background: var(--surface-hover);
+}
+
+.chat-log { display: flex; flex-direction: column; gap: var(--space-6); min-height: 200px; }
