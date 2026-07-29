@@ -4,7 +4,7 @@ import {
   Badge, Banner, Button, Card, ChatComposer, ParsedTransactionCard,
 } from '../design-system';
 import { ApiError } from '../api/client';
-import { ai } from '../api/endpoints';
+import { ai, transactions as txApi } from '../api/endpoints';
 import { money, quantity, tradeDate } from '../lib/format';
 import TransactionForm, { emptyValues, valuesFromDraft } from '../components/TransactionForm';
 import type { Confidence, Transaction, TransactionDraft } from '../types/api';
@@ -33,9 +33,12 @@ export default function LogTransactionPage() {
 
   const [parseError, setParseError] = useState<ApiError | null>(null);
   const [parsing, setParsing] = useState(false);
+  // A handoff arrives because the user chose "Edit" in the chat, so go
+  // straight to the form; a draft parsed here starts on the review card.
   const [editing, setEditing] = useState(handoff !== null);
   const [manual, setManual] = useState(false);
   const [saved, setSaved] = useState<Transaction | null>(null);
+  const [saving, setSaving] = useState(false);
 
   async function parse() {
     const t = text.trim();
@@ -55,6 +58,37 @@ export default function LogTransactionPage() {
       setDraft(null);
     } finally {
       setParsing(false);
+    }
+  }
+
+  /**
+   * Confirming the card saves it outright — the review card already showed
+   * every field, so re-presenting the same values in a form asked the user to
+   * approve twice. The form is only for when they want to change something,
+   * or when the save is rejected and they need to fix it.
+   */
+  async function confirmDraft() {
+    if (!draft || saving) return;
+    setSaving(true);
+    setParseError(null);
+    try {
+      const body = {
+        ticker: draft.ticker, side: draft.side,
+        quantity: draft.quantity, price: draft.price,
+        fees: 0, tradeDate: draft.tradeDate, note: null,
+        source: 'AI_ASSISTED' as const,
+      };
+      const t = draft.transactionId
+        ? await txApi.update(draft.transactionId, body)
+        : await txApi.create(body);
+      onSaved(t);
+    } catch (e) {
+      // Unknown ticker, or a timeline conflict — the form surfaces the
+      // field-level detail and lets them correct it.
+      if (e instanceof ApiError) setParseError(e);
+      setEditing(true);
+    } finally {
+      setSaving(false);
     }
   }
 
@@ -95,7 +129,7 @@ export default function LogTransactionPage() {
         {parseError && (
           <Banner
             tone={aiDown ? 'caution' : 'loss'}
-            title={aiDown ? 'Copilot is unavailable right now' : parseFailed ? 'Could not read that sentence' : 'Parsing failed'}
+            title={aiDown ? 'Copilot is unavailable right now' : parseFailed ? 'A few details are missing' : 'Parsing failed'}
             action={
               <Button size="sm" variant="secondary" onClick={() => { setManual(true); setParseError(null); }}>
                 Enter it manually
@@ -104,9 +138,9 @@ export default function LogTransactionPage() {
           >
             {aiDown
               ? 'The parser is offline. Enter the transaction manually — nothing else is affected.'
-              : parseFailed
-                ? 'Include an action, a symbol, a quantity and a price — for example "bought 15 NVDA at 142 last Tuesday".'
-                : parseError.message}
+              : /* The parser names exactly which fields it still needs — show that,
+                   not a generic hint, so the user can just add them and retry. */
+                parseError.message}
           </Banner>
         )}
 
@@ -122,8 +156,10 @@ export default function LogTransactionPage() {
               { key: 'Date', value: tradeDate(draft.tradeDate) },
               { key: 'Total', value: money(draft.quantity * draft.price) },
             ]}
-            confirmLabel="Confirm & save"
-            onConfirm={() => setEditing(true)}
+            confirmLabel={saving
+              ? 'Saving…'
+              : draft.transactionId ? 'Confirm & update' : 'Confirm & save'}
+            onConfirm={confirmDraft}
             onEdit={() => setEditing(true)}
             onDiscard={() => { setDraft(null); setWarnings([]); setSourceText(null); }}
           />
@@ -142,7 +178,8 @@ export default function LogTransactionPage() {
             <TransactionForm
               initial={valuesFromDraft(draft)}
               source="AI_ASSISTED"
-              submitLabel="Confirm & save"
+              editingId={draft.transactionId ?? undefined}
+              submitLabel={draft.transactionId ? 'Confirm & update' : 'Confirm & save'}
               onSaved={onSaved}
               onCancel={() => setEditing(false)}
             />

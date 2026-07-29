@@ -107,6 +107,31 @@ public class GlobalExceptionHandler {
                 request);
     }
 
+    @ExceptionHandler(AiParseFailedException.class)
+    ResponseEntity<ApiErrorResponse> handleAiParseFailed(
+            AiParseFailedException exception,
+            HttpServletRequest request) {
+        return error(
+                HttpStatus.UNPROCESSABLE_ENTITY,
+                "AI_PARSE_FAILED",
+                exception.getMessage(),
+                List.of(),
+                request);
+    }
+
+    @ExceptionHandler(AiUnavailableException.class)
+    ResponseEntity<ApiErrorResponse> handleAiUnavailable(
+            AiUnavailableException exception,
+            HttpServletRequest request) {
+        LOGGER.warn("AI provider unavailable for {}", request.getRequestURI(), exception.getCause());
+        return error(
+                HttpStatus.SERVICE_UNAVAILABLE,
+                "AI_UNAVAILABLE",
+                exception.getMessage(),
+                List.of(),
+                request);
+    }
+
     @ExceptionHandler(Exception.class)
     ResponseEntity<ApiErrorResponse> handleUnexpected(
             Exception exception,

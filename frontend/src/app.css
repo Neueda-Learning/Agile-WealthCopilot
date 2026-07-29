@@ -62,3 +62,47 @@ html, body, #root { height: 100%; }
 }
 
 .chat-log { display: flex; flex-direction: column; gap: var(--space-6); min-height: 200px; }
+
+/* Markdown in assistant replies. The bubble sets the type; these rules only
+   restore block spacing and keep wide tables from stretching the layout. */
+.md > :first-child { margin-top: 0; }
+.md > :last-child { margin-bottom: 0; }
+.md p, .md ul, .md ol, .md pre, .md blockquote { margin: 0 0 var(--space-3); }
+.md ul, .md ol { padding-left: var(--space-6); }
+.md li { margin-bottom: var(--space-1); }
+.md h1, .md h2, .md h3, .md h4 {
+  margin: var(--space-4) 0 var(--space-2);
+  font-size: var(--fs-body);
+  font-weight: 600;
+  line-height: var(--lh-heading);
+}
+.md code {
+  font-family: var(--font-mono);
+  font-size: 0.9em;
+  padding: 0.1em 0.35em;
+  border-radius: var(--radius-sm);
+  background: var(--surface-hover);
+}
+.md pre {
+  overflow-x: auto;
+  padding: var(--space-3);
+  border-radius: var(--radius-md);
+  background: var(--surface-hover);
+}
+.md pre code { padding: 0; background: none; }
+.md a { color: var(--text-brand); text-decoration: underline; }
+.md blockquote {
+  padding-left: var(--space-3);
+  border-left: 2px solid var(--border-subtle);
+  color: var(--text-secondary);
+}
+/* The agent tabulates holdings; let the table scroll inside the bubble. */
+.md .md-table-wrap, .md table { display: block; max-width: 100%; overflow-x: auto; }
+.md table { border-collapse: collapse; margin: 0 0 var(--space-3); font-size: var(--fs-sm); }
+.md th, .md td {
+  padding: var(--space-2) var(--space-3);
+  border: var(--border-width) solid var(--border-subtle);
+  text-align: left;
+  white-space: nowrap;
+}
+.md th { background: var(--surface-hover); font-weight: 600; }

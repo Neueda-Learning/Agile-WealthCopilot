@@ -145,6 +145,8 @@ export interface SymbolSearchResult {
 /* ── AI ───────────────────────────────────────────────────────────────── */
 
 export interface TransactionDraft {
+  /** null for a new entry; set when the draft edits an existing transaction. */
+  transactionId: number | null;
   ticker: string;
   side: Side;
   quantity: number;
@@ -178,7 +180,9 @@ export interface Conversation {
 }
 
 export interface ChatMessageRecord {
-  role: 'user' | 'assistant';
+  /** Uppercase, matching the backend ChatRole enum. TOOL rows are audit
+   *  records of what the agent read — not part of the visible transcript. */
+  role: 'USER' | 'ASSISTANT' | 'TOOL';
   content: string;
   createdAt: string;
 }
