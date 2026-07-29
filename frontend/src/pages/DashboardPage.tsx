@@ -9,6 +9,8 @@ import { useAsync } from '../hooks/useAsync';
 import { asOf, money, quantity } from '../lib/format';
 import { dayChangeAmount } from '../lib/portfolio';
 import { ErrorState, LoadingCard, PriceFreshness } from '../components/StateViews';
+import PnlContributionChart from '../components/charts/PnlContributionChart';
+import DayChangeWaterfall from '../components/charts/DayChangeWaterfall';
 import type { Holding, PerformanceRange } from '../types/api';
 
 const RANGES: PerformanceRange[] = ['1M', '3M', '6M', '1Y', 'ALL'];
@@ -101,6 +103,16 @@ export default function DashboardPage() {
         )}
       </Card>
 
+      <Card
+        title="P&L contribution"
+        subtitle="Unrealized gain and loss by position, largest winner first"
+      >
+        <PnlContributionChart
+          holdings={all}
+          onSelect={(ticker) => navigate('/transactions', { state: { ticker } })}
+        />
+      </Card>
+
       <div className="grid-2">
         <Card
           title="Top movers" subtitle="Today" flush
@@ -148,7 +160,18 @@ export default function DashboardPage() {
         </Card>
 
         <Card
-          title="Ask Copilot" subtitle="Read-only. It cannot trade."
+          title="Today's change by holding"
+          subtitle="What actually moved the portfolio — a big percentage on a small position barely registers"
+        >
+          {holdings.error
+            ? <ErrorState error={holdings.error} onRetry={holdings.reload} />
+            : <DayChangeWaterfall holdings={all} />}
+        </Card>
+      </div>
+
+      <div className="grid-2">
+        <Card
+          title="Ask Copilot" subtitle="Nothing is saved until you confirm it."
           action={<Badge tone="brand" icon="sparkles">Beta</Badge>}
         >
           <div className="stack-sm" style={{ gap: 'var(--space-3)' }}>

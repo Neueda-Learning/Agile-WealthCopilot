@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import {
   Badge, Button, Card, DataTable, Dialog, EmptyState, IconButton, Input, Select,
 } from '../design-system';
@@ -15,7 +15,9 @@ const PAGE_SIZE = 20;
 
 export default function TransactionsPage() {
   const navigate = useNavigate();
-  const [ticker, setTicker] = useState('');
+  const location = useLocation();
+  // Arriving from a chart bar pre-filters to that holding's history.
+  const [ticker, setTicker] = useState((location.state as { ticker?: string } | null)?.ticker ?? '');
   const [side, setSide] = useState<'' | Side>('');
   const [page, setPage] = useState(0);
 

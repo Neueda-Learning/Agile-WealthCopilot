@@ -16,6 +16,17 @@ export function money(n: number | null | undefined, digits: 0 | 2 = 2): string {
   return digits === 0 ? money0.format(n) : money2.format(n);
 }
 
+/**
+ * Money with an explicit leading sign. Charts encode direction with hue, and
+ * the gain/loss pair is close to indistinguishable under deuteranopia, so the
+ * sign has to be visible in the text rather than implied by color.
+ */
+export function signedMoney(n: number | null | undefined, digits: 0 | 2 = 2): string {
+  if (n == null || Number.isNaN(n)) return '—';
+  if (n === 0) return money(0, digits);
+  return `${n > 0 ? '+' : '-'}${money(Math.abs(n), digits)}`;
+}
+
 /** Always signed, always two decimals. `null` renders as an em dash, never 0.00%. */
 export function percent(n: number | null | undefined): string {
   if (n == null || Number.isNaN(n)) return '—';
