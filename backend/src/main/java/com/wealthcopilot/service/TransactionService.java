@@ -45,7 +45,9 @@ public class TransactionService {
     public List<TransactionResponse> listTransactions(Long userId, String ticker, LocalDate from, LocalDate to) {
         if (ticker != null && !ticker.isBlank()) {
             return transactionRepository
-                    .findAllByUserIdAndInstrumentTickerIgnoreCaseOrderByTradeDateAscIdAsc(userId, ticker)
+                    .findAllByUserIdAndInstrumentTickerStartingWithIgnoreCaseOrderByTradeDateAscIdAsc(
+                            userId,
+                            ticker.trim())
                     .stream()
                     .filter(tx -> withinRange(tx.getTradeDate(), from, to))
                     .map(this::toResponse)

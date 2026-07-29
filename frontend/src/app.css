@@ -29,6 +29,19 @@ html, body, #root { height: 100%; }
   background: var(--surface-page);
 }
 .auth-card { width: 100%; max-width: 400px; }
+.auth-language { position: fixed; top: var(--space-6); right: var(--space-6); }
+
+.language-switch {
+  display: inline-flex; align-items: center; gap: var(--space-2);
+  min-height: 32px; padding: 0 var(--space-3);
+  border: var(--border-width) solid var(--border-default);
+  border-radius: var(--radius-control);
+  background: var(--surface-card); color: var(--text-secondary);
+  font: inherit; font-size: var(--fs-sm); font-weight: 600; cursor: pointer;
+  white-space: nowrap;
+}
+.language-switch:hover { background: var(--surface-hover); color: var(--text-primary); }
+.language-switch:focus-visible { outline: 2px solid var(--border-focus); outline-offset: 2px; }
 
 .account-chip {
   display: flex; align-items: center; gap: var(--space-4);
@@ -175,6 +188,32 @@ html, body, #root { height: 100%; }
 .dv-table__total th, .dv-table__total td { border-top: var(--border-width) solid var(--border-default); }
 
 .chat-log { display: flex; flex-direction: column; gap: var(--space-6); min-height: 200px; }
+
+/* Keep the Copilot controls stationary while only the transcript grows and
+   scrolls. The height matches the app-scroll content box below the 60px bar. */
+.copilot-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--section-gap);
+  width: 100%;
+  max-width: 860px;
+  height: calc(100dvh - 60px - var(--page-padding) - var(--page-padding));
+  min-height: 0;
+  margin: 0 auto;
+  overflow: hidden;
+}
+.copilot-page__history {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding-right: var(--space-2);
+  scrollbar-gutter: stable;
+}
+.copilot-page > .wc-banner,
+.copilot-page > .wc-composer {
+  flex: 0 0 auto;
+}
 
 /* Markdown in assistant replies. The bubble sets the type; these rules only
    restore block spacing and keep wide tables from stretching the layout. */

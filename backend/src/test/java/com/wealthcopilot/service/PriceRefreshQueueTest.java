@@ -40,6 +40,20 @@ class PriceRefreshQueueTest {
         assertEquals(1, queue.size());
     }
 
+    @Test
+    void removeQueued_doesNotReleaseAnInFlightSchedulerRequest() {
+        PriceRefreshQueue queue = new PriceRefreshQueue();
+        Instrument instrument = instrument(1L, "AAPL");
+        queue.enqueue(instrument);
+        queue.drain(8);
+
+        queue.removeQueued(instrument);
+        queue.enqueue(instrument);
+
+        assertEquals(0, queue.size());
+        assertTrue(queue.drain(8).isEmpty());
+    }
+
     private Instrument instrument(Long id, String ticker) {
         Instrument instrument = new Instrument();
         instrument.setId(id);

@@ -44,6 +44,7 @@ public class SecurityConfiguration {
         return http
                 .securityMatcher("/api/v1/external/**")
                 .csrf(csrf -> csrf.disable())
+                .cors(withDefaults())
                 .sessionManagement(session ->
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authorize -> authorize

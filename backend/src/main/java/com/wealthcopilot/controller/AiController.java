@@ -45,7 +45,7 @@ public class AiController {
     /** AI Feature 1 — returns a draft for confirmation; never writes. */
     @PostMapping("/parse-transaction")
     public ParseTransactionResponse parseTransaction(@Valid @RequestBody AiParseRequest request) {
-        return transactionParseService.parse(request.text());
+        return transactionParseService.parse(request.text(), request.language());
     }
 
     /** AI Feature 2 — read-only agent; omit conversationId to start a new one. */
@@ -54,7 +54,7 @@ public class AiController {
             @RequestAttribute("userId") Long userId,
             @Valid @RequestBody AiChatRequest request
     ) {
-        return agentService.chat(userId, request.conversationId(), request.message());
+        return agentService.chat(userId, request.conversationId(), request.message(), request.language());
     }
 
     @GetMapping("/conversations")

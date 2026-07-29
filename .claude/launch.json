@@ -5,13 +5,15 @@
       "name": "frontend",
       "runtimeExecutable": "npm",
       "runtimeArgs": ["run", "dev", "--prefix", "frontend"],
-      "port": 5173
+      "port": 5173,
+      "autoPort": false
     },
     {
       "name": "backend",
       "runtimeExecutable": "mvn",
       "runtimeArgs": ["-f", "backend/pom.xml", "spring-boot:run"],
-      "port": 8080
+      "port": 8080,
+      "autoPort": false
     }
   ]
 }

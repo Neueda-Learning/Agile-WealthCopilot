@@ -10,6 +10,8 @@ import com.wealthcopilot.repository.InstrumentRepository;
 import com.wealthcopilot.repository.PriceCacheRepository;
 import java.time.Clock;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -63,7 +65,7 @@ public class PriceRefreshService {
             return;
         }
 
-        refreshInstruments(instruments);
+        refreshInstruments(instruments, true);
     }
 
     /** Fetch one newly needed quote without waiting for the scheduled batch. */
@@ -71,34 +73,80 @@ public class PriceRefreshService {
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void refreshInstrument(Instrument instrument) {
         if (instrument != null) {
-            refreshInstruments(List.of(instrument));
+            refreshInstruments(List.of(instrument), false);
         }
     }
 
-    private void refreshInstruments(List<Instrument> instruments) {
+    /**
+     * User-triggered refresh. Unlike the scheduled queue, this deliberately
+     * refreshes every requested instrument in one blocking provider call.
+     */
+    @CacheEvict(cacheNames = {"portfolioSummary", "portfolioHoldings"}, allEntries = true)
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public RefreshResult refreshInstrumentsNow(List<Instrument> instruments) {
+        Map<Long, Instrument> unique = new LinkedHashMap<>();
+        if (instruments != null) {
+            for (Instrument instrument : instruments) {
+                if (instrument != null && instrument.getId() != null) {
+                    unique.putIfAbsent(instrument.getId(), instrument);
+                }
+            }
+        }
+        return refreshInstruments(List.copyOf(unique.values()), false);
+    }
+
+    private RefreshResult refreshInstruments(List<Instrument> instruments, boolean schedulerOwned) {
+        LocalDateTime completedAt = LocalDateTime.now(clock);
+        if (instruments.isEmpty()) {
+            return new RefreshResult(0, 0, List.of(), completedAt);
+        }
+
+        List<String> failedTickers = new ArrayList<>();
+        int refreshed = 0;
         try {
             List<String> tickers = instruments.stream().map(Instrument::getTicker).toList();
             Map<String, MarketQuote> quotes = marketDataClient.fetchQuotes(tickers);
-            LocalDateTime fetchedAt = LocalDateTime.now(clock);
+            LocalDateTime fetchedAt = completedAt;
 
             for (Instrument instrument : instruments) {
                 MarketQuote quote = quotes.get(instrument.getTicker().toUpperCase(Locale.ROOT));
                 if (quote == null) {
-                    refreshQueue.retry(instrument);
+                    failedTickers.add(instrument.getTicker());
+                    requeue(instrument, schedulerOwned);
                     continue;
                 }
 
                 try {
                     persistQuote(instrument, quote, fetchedAt);
-                    refreshQueue.complete(instrument);
+                    refreshed++;
+                    if (schedulerOwned) {
+                        refreshQueue.complete(instrument);
+                    } else {
+                        refreshQueue.removeQueued(instrument);
+                    }
                 } catch (RuntimeException exception) {
-                    refreshQueue.retry(instrument);
+                    failedTickers.add(instrument.getTicker());
+                    requeue(instrument, schedulerOwned);
                     LOGGER.warn("Market data quote could not be persisted; the previous price was retained", exception);
                 }
             }
         } catch (MarketDataClientException exception) {
-            instruments.forEach(refreshQueue::retry);
+            instruments.forEach(instrument -> requeue(instrument, schedulerOwned));
+            instruments.stream().map(Instrument::getTicker).forEach(failedTickers::add);
             LOGGER.warn("Market data refresh failed; cached prices were retained");
+        }
+        return new RefreshResult(
+                instruments.size(),
+                refreshed,
+                List.copyOf(failedTickers),
+                completedAt);
+    }
+
+    private void requeue(Instrument instrument, boolean schedulerOwned) {
+        if (schedulerOwned) {
+            refreshQueue.retry(instrument);
+        } else {
+            refreshQueue.enqueue(instrument);
         }
     }
 
@@ -119,5 +167,13 @@ public class PriceRefreshService {
             cached.setFetchedAt(fetchedAt);
             priceCacheRepository.save(cached);
         }
+    }
+
+    public record RefreshResult(
+            int requested,
+            int refreshed,
+            List<String> failedTickers,
+            LocalDateTime completedAt
+    ) {
     }
 }

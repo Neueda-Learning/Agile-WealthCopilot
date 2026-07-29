@@ -42,7 +42,15 @@ public class PriceRefreshQueue {
 
     public synchronized void complete(Instrument instrument) {
         if (instrument != null && instrument.getId() != null) {
+            queued.remove(instrument.getId());
             inFlight.remove(instrument.getId());
+        }
+    }
+
+    /** Removes redundant queued work without disturbing an active scheduler fetch. */
+    public synchronized void removeQueued(Instrument instrument) {
+        if (instrument != null && instrument.getId() != null) {
+            queued.remove(instrument.getId());
         }
     }
 

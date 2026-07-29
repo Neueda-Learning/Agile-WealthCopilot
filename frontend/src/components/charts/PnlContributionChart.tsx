@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { money, percent, signedMoney } from '../../lib/format';
 import type { Holding } from '../../types/api';
 import ChartLegend from './ChartLegend';
+import { useLocale } from '../../context/LocaleContext';
 
 interface Props {
   holdings: Holding[];
@@ -18,13 +19,14 @@ interface Props {
  * is inside the band that requires a second encoding channel.
  */
 export default function PnlContributionChart({ holdings, onSelect }: Props) {
+  const { isChinese, t } = useLocale();
   const [hover, setHover] = useState<string | null>(null);
   const [asTable, setAsTable] = useState(false);
 
   const rows = [...holdings].sort((a, b) => b.unrealizedPnl - a.unrealizedPnl);
 
   if (rows.length === 0) {
-    return <p className="dv-empty">No open positions to compare.</p>;
+    return <p className="dv-empty">{t('No open positions to compare.', '暂无可比较的当前持仓。')}</p>;
   }
 
   // One scale across both arms, so a $500 loss is exactly as long as a $500 gain.
@@ -33,7 +35,7 @@ export default function PnlContributionChart({ holdings, onSelect }: Props) {
   const span = maxGain + maxLoss;
 
   if (span === 0) {
-    return <p className="dv-empty">Every position is exactly at its cost basis.</p>;
+    return <p className="dv-empty">{t('Every position is exactly at its cost basis.', '所有持仓都恰好等于其成本基础。')}</p>;
   }
 
   const zero = maxLoss / span; // 0..1 across the plot column
@@ -44,7 +46,7 @@ export default function PnlContributionChart({ holdings, onSelect }: Props) {
         <TableToggle asTable={asTable} onToggle={setAsTable} />
         <table className="dv-table">
           <thead>
-            <tr><th>Position</th><th>Cost basis</th><th>Market value</th><th>Unrealized P&amp;L</th><th>Return</th></tr>
+            <tr><th>{t('Position', '持仓')}</th><th>{t('Cost basis', '成本基础')}</th><th>{t('Market value', '市值')}</th><th>{t('Unrealized P&L', '未实现损益')}</th><th>{t('Return', '回报率')}</th></tr>
           </thead>
           <tbody>
             {rows.map((r) => (
@@ -66,8 +68,8 @@ export default function PnlContributionChart({ holdings, onSelect }: Props) {
     <>
       <div className="dv-head">
         <ChartLegend items={[
-          { label: 'Gain', color: 'var(--gain-600)' },
-          { label: 'Loss', color: 'var(--loss-600)' },
+          { label: t('Gain', '收益'), color: 'var(--gain-600)' },
+          { label: t('Loss', '亏损'), color: 'var(--loss-600)' },
         ]} />
         <TableToggle asTable={asTable} onToggle={setAsTable} />
       </div>
@@ -97,8 +99,10 @@ export default function PnlContributionChart({ holdings, onSelect }: Props) {
               onFocus={() => setHover(r.ticker)}
               onBlur={() => setHover(null)}
               aria-label={
-                `${r.ticker}, ${gain ? 'gain' : 'loss'} of ${money(Math.abs(r.unrealizedPnl))}, `
-                + `${percent(r.unrealizedPnlPct)} on a cost basis of ${money(r.costBasis)}`
+                isChinese
+                  ? `${r.ticker}，${gain ? '收益' : '亏损'} ${money(Math.abs(r.unrealizedPnl))}，成本基础 ${money(r.costBasis)}，回报率 ${percent(r.unrealizedPnlPct)}`
+                  : `${r.ticker}, ${gain ? 'gain' : 'loss'} of ${money(Math.abs(r.unrealizedPnl))}, `
+                    + `${percent(r.unrealizedPnlPct)} on a cost basis of ${money(r.costBasis)}`
               }
             >
               <span className="dv-row__key">{r.ticker}</span>
@@ -125,15 +129,15 @@ export default function PnlContributionChart({ holdings, onSelect }: Props) {
                 <span className="dv-tip" role="status">
                   <strong>{r.ticker}</strong>{r.name && r.name !== r.ticker ? ` ${r.name}` : ''}
                   <span className="dv-tip__row">
-                    <span>Unrealized</span><span>{signedMoney(r.unrealizedPnl)} ({percent(r.unrealizedPnlPct)})</span>
+                    <span>{t('Unrealized', '未实现')}</span><span>{signedMoney(r.unrealizedPnl)} ({percent(r.unrealizedPnlPct)})</span>
                   </span>
                   <span className="dv-tip__row">
-                    <span>Cost basis</span><span>{money(r.costBasis)}</span>
+                    <span>{t('Cost basis', '成本基础')}</span><span>{money(r.costBasis)}</span>
                   </span>
                   <span className="dv-tip__row">
-                    <span>Market value</span><span>{money(r.marketValue)}</span>
+                    <span>{t('Market value', '市值')}</span><span>{money(r.marketValue)}</span>
                   </span>
-                  {onSelect && <span className="dv-tip__hint">Click to see its transactions</span>}
+                  {onSelect && <span className="dv-tip__hint">{t('Click to see its transactions', '点击查看相关交易')}</span>}
                 </span>
               )}
             </div>
@@ -145,9 +149,10 @@ export default function PnlContributionChart({ holdings, onSelect }: Props) {
 }
 
 export function TableToggle({ asTable, onToggle }: { asTable: boolean; onToggle: (v: boolean) => void }) {
+  const { t } = useLocale();
   return (
     <button type="button" className="dv-toggle" onClick={() => onToggle(!asTable)}>
-      {asTable ? 'Show chart' : 'Show table'}
+      {asTable ? t('Show chart', '显示图表') : t('Show table', '显示表格')}
     </button>
   );
 }

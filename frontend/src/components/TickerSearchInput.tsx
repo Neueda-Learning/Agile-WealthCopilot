@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Input, TickerAvatar } from '../design-system';
 import { market } from '../api/endpoints';
 import type { SymbolSearchResult } from '../types/api';
+import { useLocale } from '../context/LocaleContext';
 
 interface Props {
   value: string;
@@ -16,7 +17,8 @@ interface Props {
  * system's layout notes — symbol search hits Twelve Data per request, so
  * every keystroke firing would burn the rate limit.
  */
-export default function TickerSearchInput({ value, onChange, onResolved, label = 'Symbol', error }: Props) {
+export default function TickerSearchInput({ value, onChange, onResolved, label, error }: Props) {
+  const { t } = useLocale();
   const [results, setResults] = useState<SymbolSearchResult[]>([]);
   const [open, setOpen] = useState(false);
   const [searchFailed, setSearchFailed] = useState(false);
@@ -58,7 +60,7 @@ export default function TickerSearchInput({ value, onChange, onResolved, label =
   return (
     <div className="ticker-search" ref={boxRef}>
       <Input
-        label={label}
+        label={label ?? t('Symbol', '代码')}
         iconLeft="search"
         placeholder="e.g. NVDA"
         autoComplete="off"
@@ -66,7 +68,7 @@ export default function TickerSearchInput({ value, onChange, onResolved, label =
         onChange={(e) => onChange(e.target.value.toUpperCase())}
         onFocus={() => setOpen(results.length > 0)}
         error={error}
-        hint={searchFailed && !error ? 'Symbol search is unavailable — type the exact ticker.' : undefined}
+        hint={searchFailed && !error ? t('Symbol search is unavailable — type the exact ticker.', '股票代码搜索目前不可用，请输入准确代码。') : undefined}
       />
       {open && (
         <div className="ticker-search__menu">
@@ -88,7 +90,7 @@ export default function TickerSearchInput({ value, onChange, onResolved, label =
               </span>
               {r.currency !== 'USD' && (
                 <span style={{ marginLeft: 'auto', fontSize: 'var(--fs-xs)', color: 'var(--amber-700)' }}>
-                  {r.currency} — not supported
+                  {r.currency} — {t('not supported', '不支持')}
                 </span>
               )}
             </button>

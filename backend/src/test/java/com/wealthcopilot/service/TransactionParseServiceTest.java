@@ -98,6 +98,20 @@ class TransactionParseServiceTest {
     }
 
     @Test
+    void parse_chineseLocaleReturnsChineseMissingFieldMessage() {
+        givenLlmReturns("""
+                {"ticker": "NVDA", "side": "BUY", "quantity": null, "price": 142.0,
+                 "tradeDate": null, "confidence": "MEDIUM", "warnings": []}""");
+
+        AiParseFailedException exception = assertThrows(
+                AiParseFailedException.class,
+                () -> parseService.parse("以 142 美元买入 NVDA", "zh-CN"));
+
+        assertTrue(exception.getMessage().contains("股数"));
+        assertTrue(exception.getMessage().contains("交易日期"));
+    }
+
+    @Test
     void parse_unknownTicker_fails() {
         givenLlmReturns("""
                 {"ticker": "NOPE", "side": "BUY", "quantity": 5, "price": 10,

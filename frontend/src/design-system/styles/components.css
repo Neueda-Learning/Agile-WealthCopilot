@@ -174,7 +174,8 @@
 .wc-topbar__spacer{flex:1}
 
 .wc-wordmark{display:inline-flex;align-items:center;gap:var(--space-3);font-family:var(--font-sans);font-weight:var(--fw-bold);letter-spacing:-0.03em;color:var(--text-primary);white-space:nowrap}
-.wc-wordmark__dot{display:inline-block;border-radius:var(--radius-xs);background:var(--surface-brand);transform:rotate(45deg)}
+.wc-wordmark__logo{display:block;flex:0 0 auto;object-fit:contain}
+.wc-wordmark__logo--monochrome{filter:grayscale(1)}
 .wc-wordmark em{font-style:normal;font-weight:var(--fw-light);color:var(--text-secondary)}
 
 /* ── AI surfaces ──────────────────────────────────────────────────────── */

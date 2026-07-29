@@ -72,6 +72,7 @@ Errors: 401 bad credentials.
 ### GET /transactions
 Query params: `ticker?`, `side?` (BUY|SELL), `from?`, `to?` (ISO dates),
 `page=0`, `size=20`, `sort=tradeDate,desc`.
+`ticker` is a case-insensitive prefix filter, so `AA` matches `AAPL`.
 
 `200` → paginated list of:
 ```json
@@ -145,6 +146,19 @@ individually), never treated as zero-change.
 }
 ```
 
+### POST /portfolio/holdings/refresh
+Synchronously fetches quotes for every currently held instrument belonging to
+the authenticated user, upserts `price_cache`, and evicts derived portfolio
+caches before returning.
+```json
+{
+  "requested": 4,
+  "refreshed": 4,
+  "failedTickers": [],
+  "completedAt": "2026-07-29T12:00:00"
+}
+```
+
 ### GET /portfolio/holdings/{ticker}
 Single holding (shape above) plus its transaction list. 404 if no position.
 
@@ -184,7 +198,7 @@ Backed by Twelve Data symbol search with in-process caching.
 ### POST /ai/parse-transaction  (Feature 1 — never saves)
 ```json
 // request
-{ "text": "Bought 15 Nvidia at 142 last Tuesday" }
+{ "text": "Bought 15 Nvidia at 142 last Tuesday", "language": "en" }
 // 200 response
 {
   "draft": {
@@ -198,11 +212,13 @@ Backed by Twelve Data symbol search with in-process caching.
 Errors: 422 `AI_PARSE_FAILED` (unintelligible input / LLM returned invalid
 JSON after retry), 503 `AI_UNAVAILABLE`. The frontend pre-fills the manual
 form with `draft`; the user confirms via normal `POST /transactions`.
+`language` is optional and accepts `en` (default) or `zh-CN`. With `zh-CN`,
+the extraction system prompt, warnings, and parse errors use Simplified Chinese.
 
 ### POST /ai/chat  (Feature 2 — read-only agent)
 ```json
 // request
-{ "conversationId": 7, "message": "Which holding has lost me the most?" }
+{ "conversationId": 7, "message": "Which holding has lost me the most?", "language": "en" }
 // 200 response
 {
   "conversationId": 7,
@@ -212,6 +228,8 @@ form with `draft`; the user confirms via normal `POST /transactions`.
 }
 ```
 Omit `conversationId` to start a new conversation (id returned).
+`language` is optional and accepts `en` (default) or `zh-CN`; it controls the
+agent system prompt and response language for that turn.
 `draftTransaction` is non-null only when the agent used `draft_transaction`;
 the UI then opens the pre-filled form — the agent itself never writes.
 Errors: 404 conversation not found (or not yours), 503 `AI_UNAVAILABLE`.

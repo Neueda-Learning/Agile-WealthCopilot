@@ -112,6 +112,24 @@ class MarketDataPersistenceTest {
         assertEquals("NVDA", instruments.get(0).getTicker());
     }
 
+    @Test
+    void currentlyHeldInstrumentsByUserId_isScopedToTheAuthenticatedUser() {
+        Instrument userOneHolding = saveInstrument("AAPL");
+        Instrument userTwoHolding = saveInstrument("NVDA");
+        Instrument userOneClosed = saveInstrument("MSFT");
+        transactionRepository.save(transaction(1L, userOneHolding, TransactionSide.BUY, "2"));
+        transactionRepository.save(transaction(2L, userTwoHolding, TransactionSide.BUY, "3"));
+        transactionRepository.save(transaction(1L, userOneClosed, TransactionSide.BUY, "1"));
+        transactionRepository.saveAndFlush(
+                transaction(1L, userOneClosed, TransactionSide.SELL, "1"));
+
+        var instruments =
+                transactionRepository.findAllCurrentlyHeldInstrumentsByUserId(1L);
+
+        assertEquals(1, instruments.size());
+        assertEquals("AAPL", instruments.get(0).getTicker());
+    }
+
     private Instrument saveInstrument(String ticker) {
         Instrument instrument = new Instrument();
         instrument.setTicker(ticker);
@@ -130,8 +148,17 @@ class MarketDataPersistenceTest {
     }
 
     private Transaction transaction(Instrument instrument, TransactionSide side, String quantity) {
+        return transaction(1L, instrument, side, quantity);
+    }
+
+    private Transaction transaction(
+            Long userId,
+            Instrument instrument,
+            TransactionSide side,
+            String quantity
+    ) {
         Transaction transaction = new Transaction();
-        transaction.setUserId(1L);
+        transaction.setUserId(userId);
         transaction.setInstrument(instrument);
         transaction.setSide(side);
         transaction.setQuantity(new BigDecimal(quantity));

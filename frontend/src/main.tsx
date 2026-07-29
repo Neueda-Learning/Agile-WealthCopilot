@@ -2,6 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
+import { LocaleProvider } from './context/LocaleContext';
 import App from './App';
 
 // The design system's single stylesheet — it @imports the tokens and the
@@ -12,9 +13,11 @@ import './app.css';
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <BrowserRouter>
-      <AuthProvider>
-        <App />
-      </AuthProvider>
+      <LocaleProvider>
+        <AuthProvider>
+          <App />
+        </AuthProvider>
+      </LocaleProvider>
     </BrowserRouter>
   </React.StrictMode>,
 );

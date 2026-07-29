@@ -4,6 +4,7 @@ import { dayChangeAmount } from '../../lib/portfolio';
 import type { Holding } from '../../types/api';
 import ChartLegend from './ChartLegend';
 import { TableToggle } from './PnlContributionChart';
+import { useLocale } from '../../context/LocaleContext';
 
 /** Beyond this the columns get too narrow to label; the tail folds into "Other". */
 const MAX_CONTRIBUTORS = 7;
@@ -30,6 +31,7 @@ interface Step {
  * beneath the chart — the spec forbids showing them as flat.
  */
 export default function DayChangeWaterfall({ holdings }: { holdings: Holding[] }) {
+  const { isChinese, t } = useLocale();
   const [hover, setHover] = useState<string | null>(null);
   const [asTable, setAsTable] = useState(false);
 
@@ -51,8 +53,8 @@ export default function DayChangeWaterfall({ holdings }: { holdings: Holding[] }
   if (priced.length === 0) {
     return (
       <p className="dv-empty">
-        No holding has a previous close cached yet, so today&apos;s move cannot be attributed.
-        {excluded > 0 && ` ${excluded} position${excluded === 1 ? '' : 's'} waiting on a quote.`}
+        {t("No holding has a previous close cached yet, so today's move cannot be attributed.", '尚无持仓缓存了前收盘价，因此无法分析今日变动来源。')}
+        {excluded > 0 && (isChinese ? ` ${excluded} 项持仓正在等待行情。` : ` ${excluded} position${excluded === 1 ? '' : 's'} waiting on a quote.`)}
       </p>
     );
   }
@@ -62,7 +64,7 @@ export default function DayChangeWaterfall({ holdings }: { holdings: Holding[] }
   const tail = ranked.slice(MAX_CONTRIBUTORS);
   if (tail.length > 0) {
     steps.push({
-      key: '__other', label: `Other ${tail.length}`,
+      key: '__other', label: isChinese ? `其他 ${tail.length}` : `Other ${tail.length}`,
       amount: tail.reduce((sum, t) => sum + t.amount, 0),
       pct: null,
       marketValue: tail.reduce((sum, t) => sum + t.marketValue, 0),
@@ -96,7 +98,7 @@ export default function DayChangeWaterfall({ holdings }: { holdings: Holding[] }
         <TableToggle asTable={asTable} onToggle={setAsTable} />
         <table className="dv-table">
           <thead>
-            <tr><th>Position</th><th>Market value</th><th>Today %</th><th>Contribution</th></tr>
+            <tr><th>{t('Position', '持仓')}</th><th>{t('Market value', '市值')}</th><th>{t('Today %', '今日 %')}</th><th>{t('Contribution', '贡献')}</th></tr>
           </thead>
           <tbody>
             {bars.map((b) => (
@@ -108,11 +110,11 @@ export default function DayChangeWaterfall({ holdings }: { holdings: Holding[] }
               </tr>
             ))}
             <tr className="dv-table__total">
-              <th scope="row">Net change</th><td /><td /><td>{signedMoney(total)}</td>
+              <th scope="row">{t('Net change', '净变动')}</th><td /><td /><td>{signedMoney(total)}</td>
             </tr>
           </tbody>
         </table>
-        {excluded > 0 && <p className="dv-note">{excluded} position{excluded === 1 ? '' : 's'} excluded — no previous close cached.</p>}
+        {excluded > 0 && <p className="dv-note">{isChinese ? `${excluded} 项持仓因没有缓存前收盘价而被排除。` : `${excluded} position${excluded === 1 ? '' : 's'} excluded — no previous close cached.`}</p>}
       </>
     );
   }
@@ -123,9 +125,9 @@ export default function DayChangeWaterfall({ holdings }: { holdings: Holding[] }
     <>
       <div className="dv-head">
         <ChartLegend items={[
-          { label: 'Added', color: 'var(--gain-600)' },
-          { label: 'Subtracted', color: 'var(--loss-600)' },
-          { label: 'Net change', color: 'var(--ink-500)' },
+          { label: t('Added', '增加'), color: 'var(--gain-600)' },
+          { label: t('Subtracted', '减少'), color: 'var(--loss-600)' },
+          { label: t('Net change', '净变动'), color: 'var(--ink-500)' },
         ]} />
         <TableToggle asTable={asTable} onToggle={setAsTable} />
       </div>
@@ -148,8 +150,10 @@ export default function DayChangeWaterfall({ holdings }: { holdings: Holding[] }
               onBlur={() => setHover(null)}
               tabIndex={0}
               aria-label={
-                `${b.label} ${up ? 'added' : 'subtracted'} ${money(Math.abs(b.amount))} today`
-                + (b.pct == null ? '' : `, ${percent(b.pct)}`)
+                isChinese
+                  ? `${b.label} 今日${up ? '增加' : '减少'} ${money(Math.abs(b.amount))}${b.pct == null ? '' : `，${percent(b.pct)}`}`
+                  : `${b.label} ${up ? 'added' : 'subtracted'} ${money(Math.abs(b.amount))} today`
+                    + (b.pct == null ? '' : `, ${percent(b.pct)}`)
               }
             >
               <span
@@ -177,13 +181,13 @@ export default function DayChangeWaterfall({ holdings }: { holdings: Holding[] }
                 <span className="dv-tip dv-tip--col" role="status">
                   <strong>{b.label}</strong>
                   <span className="dv-tip__row">
-                    <span>Contribution</span><span>{signedMoney(b.amount)}</span>
+                    <span>{t('Contribution', '贡献')}</span><span>{signedMoney(b.amount)}</span>
                   </span>
                   <span className="dv-tip__row">
-                    <span>Today</span><span>{b.pct == null ? 'mixed' : percent(b.pct)}</span>
+                    <span>{t('Today', '今日')}</span><span>{b.pct == null ? t('mixed', '混合') : percent(b.pct)}</span>
                   </span>
                   <span className="dv-tip__row">
-                    <span>Market value</span><span>{money(b.marketValue)}</span>
+                    <span>{t('Market value', '市值')}</span><span>{money(b.marketValue)}</span>
                   </span>
                 </span>
               )}
@@ -209,14 +213,15 @@ export default function DayChangeWaterfall({ holdings }: { holdings: Holding[] }
           >
             {signedMoney(total, 0)}
           </span>
-          <span className="dv-fall__key">Net</span>
+          <span className="dv-fall__key">{t('Net', '净额')}</span>
         </div>
       </div>
 
       {excluded > 0 && (
         <p className="dv-note">
-          {excluded} position{excluded === 1 ? '' : 's'} excluded — no previous close cached, so
-          their share of today&apos;s move is unknown.
+          {isChinese
+            ? `${excluded} 项持仓因没有缓存前收盘价而被排除，因此无法确定它们对今日变动的影响。`
+            : `${excluded} position${excluded === 1 ? '' : 's'} excluded — no previous close cached, so their share of today's move is unknown.`}
         </p>
       )}
     </>

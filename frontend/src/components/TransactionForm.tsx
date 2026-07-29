@@ -5,6 +5,7 @@ import { transactions } from '../api/endpoints';
 import { money, todayIso } from '../lib/format';
 import type { Side, Transaction, TransactionDraft, TransactionRequest, TransactionSource } from '../types/api';
 import TickerSearchInput from './TickerSearchInput';
+import { useLocale } from '../context/LocaleContext';
 
 export interface TransactionFormValues {
   ticker: string;
@@ -48,8 +49,10 @@ interface Props {
 }
 
 export default function TransactionForm({
-  initial, source, editingId, submitLabel = 'Save transaction', onSaved, onCancel,
+  initial, source, editingId, submitLabel, onSaved, onCancel,
 }: Props) {
+  const { t } = useLocale();
+  const resolvedSubmitLabel = submitLabel ?? t('Save transaction', '保存交易');
   const [v, setV] = useState<TransactionFormValues>(initial);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   // Timeline rejections arrive as details[] without a field — they describe a
@@ -95,7 +98,7 @@ export default function TransactionForm({
         setFormErrors(err.details.filter((d) => !d.field).map((d) => d.issue));
         setMessage(err.message);
       } else {
-        setMessage('Could not save the transaction.');
+        setMessage(t('Could not save the transaction.', '无法保存交易。'));
       }
     } finally {
       setBusy(false);
@@ -105,7 +108,7 @@ export default function TransactionForm({
   return (
     <form onSubmit={submit} className="stack-sm">
       {message && (
-        <Banner tone="loss" title={editingId ? 'Cannot update this transaction' : 'Cannot save this transaction'}>
+        <Banner tone="loss" title={editingId ? t('Cannot update this transaction', '无法更新此交易') : t('Cannot save this transaction', '无法保存此交易')}>
           {message}
           {formErrors.length > 0 && (
             <ul style={{ margin: 'var(--space-3) 0 0', paddingLeft: 'var(--space-6)' }}>
@@ -117,10 +120,10 @@ export default function TransactionForm({
 
       <div className="grid-3">
         <Select
-          label="Action"
+          label={t('Action', '操作')}
           value={v.side}
           onChange={(e) => set('side', e.target.value as Side)}
-          options={[{ value: 'BUY', label: 'Buy' }, { value: 'SELL', label: 'Sell' }]}
+          options={[{ value: 'BUY', label: t('Buy', '买入') }, { value: 'SELL', label: t('Sell', '卖出') }]}
         />
         <TickerSearchInput
           value={v.ticker}
@@ -128,25 +131,25 @@ export default function TransactionForm({
           error={fieldErrors.ticker}
         />
         <Input
-          label="Trade date" type="date" required
+          label={t('Trade date', '交易日期')} type="date" required
           value={v.tradeDate}
           onChange={(e) => set('tradeDate', e.target.value)}
           error={fieldErrors.tradeDate}
         />
         <Input
-          label="Quantity" numeric inputMode="decimal" required
+          label={t('Quantity', '数量')} numeric inputMode="decimal" required
           value={v.quantity}
           onChange={(e) => set('quantity', e.target.value)}
-          error={fieldErrors.quantity || (v.quantity !== '' && qty <= 0 ? 'Enter a quantity above 0.' : undefined)}
+          error={fieldErrors.quantity || (v.quantity !== '' && qty <= 0 ? t('Enter a quantity above 0.', '请输入大于 0 的数量。') : undefined)}
         />
         <Input
-          label="Price per share" prefix="$" numeric inputMode="decimal" required
+          label={t('Price per share', '每股价格')} prefix="$" numeric inputMode="decimal" required
           value={v.price}
           onChange={(e) => set('price', e.target.value)}
-          error={fieldErrors.price || (v.price !== '' && price <= 0 ? 'Enter a price above 0.' : undefined)}
+          error={fieldErrors.price || (v.price !== '' && price <= 0 ? t('Enter a price above 0.', '请输入大于 0 的价格。') : undefined)}
         />
         <Input
-          label="Fees" prefix="$" numeric inputMode="decimal"
+          label={t('Fees', '费用')} prefix="$" numeric inputMode="decimal"
           value={v.fees}
           onChange={(e) => set('fees', e.target.value)}
           error={fieldErrors.fees}
@@ -154,7 +157,7 @@ export default function TransactionForm({
       </div>
 
       <Input
-        label="Note" placeholder="Optional"
+        label={t('Note', '备注')} placeholder={t('Optional', '可选')}
         value={v.note}
         onChange={(e) => set('note', e.target.value)}
         error={fieldErrors.note}
@@ -162,17 +165,17 @@ export default function TransactionForm({
 
       <div className="row">
         <span style={{ fontSize: 'var(--fs-sm)', color: 'var(--text-muted)' }}>
-          Total {v.side === 'BUY' ? 'cost' : 'proceeds'}
+          {v.side === 'BUY' ? t('Total cost', '总成本') : t('Total proceeds', '总收入')}
         </span>
         <span className="wc-num" style={{ fontWeight: 500, color: 'var(--text-primary)' }}>
           {money(total)}
         </span>
         <span className="spacer" />
         {onCancel && (
-          <Button type="button" variant="ghost" onClick={onCancel}>Cancel</Button>
+          <Button type="button" variant="ghost" onClick={onCancel}>{t('Cancel', '取消')}</Button>
         )}
         <Button type="submit" disabled={busy || !valid}>
-          {busy ? 'Saving…' : submitLabel}
+          {busy ? t('Saving…', '正在保存…') : resolvedSubmitLabel}
         </Button>
       </div>
     </form>
