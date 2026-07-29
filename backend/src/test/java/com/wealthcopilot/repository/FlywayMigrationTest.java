@@ -26,12 +26,16 @@ class FlywayMigrationTest {
 
         MigrateResult result = flyway.migrate();
 
-        assertEquals(3, result.migrationsExecuted);
+        assertEquals(4, result.migrationsExecuted);
 
         try (Connection connection = DriverManager.getConnection(DATABASE_URL, "sa", "")) {
             DatabaseMetaData metadata = connection.getMetaData();
             assertTrue(tableExists(metadata, "price_cache"));
             assertTrue(tableExists(metadata, "api_keys"));
+            assertTrue(tableExists(metadata, "conversations"));
+            assertTrue(tableExists(metadata, "chat_messages"));
+            assertTrue(foreignKeyExists(metadata, "conversations", "user_id", "users", "id"));
+            assertTrue(foreignKeyExists(metadata, "chat_messages", "conversation_id", "conversations", "id"));
             assertTrue(primaryKeyContains(metadata, "price_cache", "instrument_id"));
             assertTrue(foreignKeyExists(metadata, "price_cache", "instrument_id", "instruments", "id"));
             assertTrue(uniqueIndexContains(metadata, "api_keys", "key_hash"));

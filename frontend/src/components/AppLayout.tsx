@@ -14,7 +14,9 @@ const NAV_GROUPS = [
   {
     label: 'Copilot',
     items: [
-      { id: '/log', label: 'Log transaction', icon: 'plus-circle' },
+      // Lucide renamed plus-circle -> circle-plus; the old name 404s on the
+      // icon CDN and silently renders nothing.
+      { id: '/log', label: 'Log transaction', icon: 'circle-plus' },
       { id: '/copilot', label: 'Ask Copilot', icon: 'sparkles', badge: <Badge tone="brand">New</Badge> },
     ],
   },
@@ -25,7 +27,7 @@ const TITLES: Record<string, [string, string]> = {
   '/holdings': ['Holdings', 'Every open position'],
   '/transactions': ['Transactions', 'Everything you have recorded'],
   '/log': ['Log transaction', 'Describe it, review it, save it'],
-  '/copilot': ['Ask Copilot', 'Read-only portfolio assistant'],
+  '/copilot': ['Ask Copilot', 'Portfolio and markets assistant'],
 };
 
 function initials(name: string): string {
@@ -69,7 +71,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
           {onCopilot && (
             <span className="row" style={{ color: 'var(--text-muted)', fontSize: 'var(--fs-sm)' }}>
               <Icon name="wrench" size={14} />
-              Read-only
+              You confirm every change
             </span>
           )}
         </TopBar>
