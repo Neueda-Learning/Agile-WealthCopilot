@@ -59,6 +59,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 authentication.setDetails(
                         new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(authentication);
+                // Controllers receive the authenticated owner through this request
+                // attribute, keeping user IDs out of client-controlled parameters.
+                request.setAttribute("userId", principal.userId());
             }
         } catch (JwtException | AuthenticationException | IllegalArgumentException exception) {
             SecurityContextHolder.clearContext();

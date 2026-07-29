@@ -3,6 +3,7 @@ package com.wealthcopilot.controller;
 import com.wealthcopilot.dto.response.HoldingResponse;
 import com.wealthcopilot.dto.response.PerformanceSummaryResponse;
 import com.wealthcopilot.dto.response.PortfolioSummaryResponse;
+import com.wealthcopilot.exception.DomainValidationException;
 import com.wealthcopilot.service.PortfolioService;
 import java.time.LocalDate;
 import java.util.List;
@@ -36,9 +37,20 @@ public class PortfolioController {
     @GetMapping("/performance")
     public PerformanceSummaryResponse performance(
             @RequestAttribute("userId") Long userId,
+            @RequestParam(required = false) String range,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to
     ) {
+        if (from == null && to == null && range != null && !range.isBlank() && !"ALL".equalsIgnoreCase(range)) {
+            to = LocalDate.now();
+            from = switch (range.toUpperCase()) {
+                case "1M" -> to.minusMonths(1);
+                case "3M" -> to.minusMonths(3);
+                case "6M" -> to.minusMonths(6);
+                case "1Y" -> to.minusYears(1);
+                default -> throw new DomainValidationException("range must be one of 1M, 3M, 6M, 1Y, or ALL");
+            };
+        }
         return portfolioService.getInvestedAmount(userId, from, to);
     }
 }

@@ -11,6 +11,7 @@ import com.wealthcopilot.entity.Instrument;
 import com.wealthcopilot.marketdata.MarketDataClient;
 import com.wealthcopilot.marketdata.MarketDataClientException;
 import com.wealthcopilot.marketdata.MarketDataProperties;
+import com.wealthcopilot.repository.InstrumentRepository;
 import com.wealthcopilot.repository.PriceCacheRepository;
 import java.math.BigDecimal;
 import java.time.Clock;
@@ -34,6 +35,9 @@ class PriceRefreshServiceTest {
     private PriceCacheRepository priceCacheRepository;
 
     @Mock
+    private InstrumentRepository instrumentRepository;
+
+    @Mock
     private MarketDataClient marketDataClient;
 
     private PriceRefreshQueue queue;
@@ -47,6 +51,7 @@ class PriceRefreshServiceTest {
         Clock clock = Clock.fixed(Instant.parse("2026-07-28T12:00:00Z"), ZoneOffset.UTC);
         refreshService = new PriceRefreshService(
                 queue,
+                instrumentRepository,
                 priceCacheRepository,
                 marketDataClient,
                 properties,
@@ -61,6 +66,8 @@ class PriceRefreshServiceTest {
         queue.enqueue(instrument(3L, "NVDA"));
         when(marketDataClient.fetchQuotes(anyList())).thenAnswer(invocation -> quotes(invocation.getArgument(0)));
         when(priceCacheRepository.findByInstrumentId(any(Long.class))).thenReturn(Optional.empty());
+        when(instrumentRepository.findById(any(Long.class))).thenAnswer(invocation ->
+                Optional.of(instrument(invocation.getArgument(0), "AAPL")));
 
         refreshService.refreshNextBatch();
 

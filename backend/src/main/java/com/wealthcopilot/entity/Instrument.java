@@ -32,7 +32,7 @@ public class Instrument {
     @Column(nullable = false)
     private InstrumentType type;
 
-    @Column(nullable = false, length = 3)
+    @Column(nullable = false, length = 3, columnDefinition = "CHAR(3)")
     private String currency = "USD";
 
     @Column(name = "created_at", nullable = false)
