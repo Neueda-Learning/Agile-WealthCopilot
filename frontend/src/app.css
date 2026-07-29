@@ -29,6 +29,19 @@ html, body, #root { height: 100%; }
   background: var(--surface-page);
 }
 .auth-card { width: 100%; max-width: 400px; }
+.auth-language { position: fixed; top: var(--space-6); right: var(--space-6); }
+
+.language-switch {
+  display: inline-flex; align-items: center; gap: var(--space-2);
+  min-height: 32px; padding: 0 var(--space-3);
+  border: var(--border-width) solid var(--border-default);
+  border-radius: var(--radius-control);
+  background: var(--surface-card); color: var(--text-secondary);
+  font: inherit; font-size: var(--fs-sm); font-weight: 600; cursor: pointer;
+  white-space: nowrap;
+}
+.language-switch:hover { background: var(--surface-hover); color: var(--text-primary); }
+.language-switch:focus-visible { outline: 2px solid var(--border-focus); outline-offset: 2px; }
 
 .account-chip {
   display: flex; align-items: center; gap: var(--space-4);
@@ -61,7 +74,146 @@ html, body, #root { height: 100%; }
   background: var(--surface-hover);
 }
 
+/* ── Charts ───────────────────────────────────────────────────────────────
+   Data carries the only saturated color on screen; grid, axes and every piece
+   of text stay on neutral tokens so the marks are the loudest thing. */
+.dv-head {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: var(--space-4); margin-bottom: var(--space-5);
+}
+.dv-legend { display: inline-flex; align-items: center; gap: var(--space-4); flex-wrap: wrap; }
+.dv-legend__item {
+  display: inline-flex; align-items: center; gap: var(--space-2);
+  font-size: var(--fs-sm); color: var(--text-secondary);
+}
+.dv-legend__swatch { width: 10px; height: 10px; border-radius: 2px; flex: 0 0 auto; }
+
+.dv-toggle {
+  border: var(--border-width) solid var(--border-default);
+  background: var(--surface-card); color: var(--text-secondary);
+  font: inherit; font-size: var(--fs-sm); cursor: pointer;
+  padding: var(--space-1) var(--space-3); border-radius: var(--radius-sm);
+}
+.dv-toggle:hover { background: var(--surface-hover); color: var(--text-primary); }
+.dv-toggle:focus-visible { outline: 2px solid var(--border-focus); outline-offset: 2px; }
+
+.dv-empty, .dv-note {
+  margin: var(--space-3) 0 0; font-size: var(--fs-sm); color: var(--text-muted);
+}
+
+/* Diverging bars — P&L contribution */
+.dv-body { position: relative; }
+.dv-row {
+  display: grid; grid-template-columns: 64px 1fr 96px; align-items: center;
+  gap: var(--space-3); height: 30px; position: relative; border-radius: var(--radius-sm);
+}
+.dv-row[role='button'] { cursor: pointer; }
+.dv-row.is-active { background: var(--surface-hover); }
+.dv-row:focus-visible { outline: 2px solid var(--border-focus); outline-offset: 1px; }
+.dv-row__key {
+  font-size: var(--fs-sm); font-weight: 600; color: var(--text-primary);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.dv-row__plot { position: relative; height: 100%; }
+.dv-row__zero { position: absolute; top: 0; bottom: 0; width: 1px; background: var(--border-strong); }
+.dv-row__bar { position: absolute; top: 6px; height: 18px; min-width: 2px; }
+.dv-row__val {
+  font-size: var(--fs-sm); text-align: right; font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+/* Sign is already carried by direction and by the explicit +/− in the value,
+   so these tints are reinforcement, never the only cue. */
+.dv-row__val.is-gain, .dv-fall__val.is-gain { color: var(--text-gain); }
+.dv-row__val.is-loss, .dv-fall__val.is-loss { color: var(--text-loss); }
+.dv-fall__val.is-total { color: var(--text-secondary); }
+
+/* Waterfall — today's change by holding */
+.dv-fall {
+  position: relative; display: grid; gap: var(--space-3);
+  height: 240px; margin-top: var(--space-6);
+  /* Margin, not padding: the zero line is positioned against this element's
+     padding box while the columns are sized by its content box, so any padding
+     here would desynchronise the two by exactly that amount. The ticker labels
+     hang into the margin instead. */
+  margin-bottom: 22px;
+}
+.dv-fall__zero {
+  position: absolute; left: 0; right: 0; height: 1px;
+  background: var(--border-strong);
+}
+.dv-fall__col { position: relative; }
+.dv-fall__col:focus-visible { outline: 2px solid var(--border-focus); outline-offset: 2px; border-radius: var(--radius-sm); }
+.dv-fall__col.is-active .dv-fall__bar { filter: brightness(0.92); }
+.dv-fall__bar {
+  position: absolute; left: 12%; right: 12%; min-height: 2px;
+}
+.dv-fall__link {
+  position: absolute; right: calc(-1 * var(--space-3)); width: var(--space-3);
+  height: 1px; background: var(--border-default);
+}
+.dv-fall__val {
+  position: absolute; left: 0; right: 0; text-align: center;
+  font-size: 11px; font-variant-numeric: tabular-nums; white-space: nowrap;
+}
+.dv-fall__key {
+  position: absolute; left: 0; right: 0; bottom: -20px; text-align: center;
+  font-size: 11px; color: var(--text-secondary);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.dv-fall__col--total .dv-fall__key { font-weight: 600; color: var(--text-primary); }
+
+/* Tooltip */
+.dv-tip {
+  position: absolute; z-index: 5; left: 50%; transform: translate(-50%, -100%);
+  top: -6px; min-width: 190px; display: flex; flex-direction: column; gap: 2px;
+  padding: var(--space-3); border-radius: var(--radius-md);
+  background: var(--surface-inverse); color: var(--text-inverse);
+  font-size: var(--fs-sm); box-shadow: var(--shadow-md, 0 6px 20px rgba(11,18,32,.22));
+  pointer-events: none;
+}
+.dv-tip--col { top: 0; }
+.dv-tip__row { display: flex; justify-content: space-between; gap: var(--space-4); opacity: .85; }
+.dv-tip__hint { margin-top: var(--space-2); opacity: .6; font-size: 11px; }
+
+/* Table view — the accessible equal of every chart above */
+.dv-table { width: 100%; border-collapse: collapse; font-size: var(--fs-sm); }
+.dv-table th, .dv-table td {
+  padding: var(--space-2) var(--space-3); text-align: right;
+  border-bottom: var(--border-width) solid var(--border-subtle);
+}
+.dv-table thead th { color: var(--text-secondary); font-weight: 600; }
+.dv-table th:first-child, .dv-table thead th:first-child { text-align: left; }
+.dv-table tbody th { color: var(--text-primary); font-weight: 600; }
+.dv-table td { color: var(--text-body); font-variant-numeric: tabular-nums; }
+.dv-table__total th, .dv-table__total td { border-top: var(--border-width) solid var(--border-default); }
+
 .chat-log { display: flex; flex-direction: column; gap: var(--space-6); min-height: 200px; }
+
+/* Keep the Copilot controls stationary while only the transcript grows and
+   scrolls. The height matches the app-scroll content box below the 60px bar. */
+.copilot-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--section-gap);
+  width: 100%;
+  max-width: 860px;
+  height: calc(100dvh - 60px - var(--page-padding) - var(--page-padding));
+  min-height: 0;
+  margin: 0 auto;
+  overflow: hidden;
+}
+.copilot-page__history {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding-right: var(--space-2);
+  scrollbar-gutter: stable;
+}
+.copilot-page > .wc-banner,
+.copilot-page > .wc-composer {
+  flex: 0 0 auto;
+}
 
 /* Markdown in assistant replies. The bubble sets the type; these rules only
    restore block spacing and keep wide tables from stretching the layout. */

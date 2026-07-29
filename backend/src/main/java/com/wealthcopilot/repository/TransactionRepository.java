@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 public interface TransactionRepository extends JpaRepository<Transaction, Long> {
 
@@ -20,9 +21,9 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
             LocalDate to
     );
 
-    List<Transaction> findAllByUserIdAndInstrumentTickerIgnoreCaseOrderByTradeDateAscIdAsc(
+    List<Transaction> findAllByUserIdAndInstrumentTickerStartingWithIgnoreCaseOrderByTradeDateAscIdAsc(
             Long userId,
-            String ticker
+            String tickerPrefix
     );
 
     @Query("""
@@ -38,4 +39,19 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
             ) > 0
             """)
     List<Instrument> findAllCurrentlyHeldInstruments();
+
+    @Query("""
+            select transaction.instrument
+            from Transaction transaction
+            where transaction.userId = :userId
+            group by transaction.instrument
+            having sum(
+                case
+                    when transaction.side = com.wealthcopilot.entity.TransactionSide.BUY
+                    then transaction.quantity
+                    else -transaction.quantity
+                end
+            ) > 0
+            """)
+    List<Instrument> findAllCurrentlyHeldInstrumentsByUserId(@Param("userId") Long userId);
 }

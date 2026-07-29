@@ -2,9 +2,10 @@ import { request } from './client';
 import type {
   ChatMessageRecord, ChatResponse, Conversation, Holding, HoldingDetail,
   LoginResponse, Page, ParseTransactionResponse, Performance, PerformanceRange,
-  PortfolioSummary, Quote, SymbolSearchResult, Transaction, TransactionQuery,
+  PortfolioSummary, PriceRefreshResult, Quote, SymbolSearchResult, Transaction, TransactionQuery,
   TransactionRequest, User,
 } from '../types/api';
+import type { AppLocale } from '../context/LocaleContext';
 
 export const auth = {
   register: (email: string, password: string, displayName: string) =>
@@ -41,6 +42,8 @@ export const transactions = {
 export const portfolio = {
   summary: () => request<PortfolioSummary>('/portfolio/summary'),
   holdings: () => request<Holding[]>('/portfolio/holdings'),
+  refreshPrices: () =>
+    request<PriceRefreshResult>('/portfolio/holdings/refresh', { method: 'POST' }),
   holding: (ticker: string) => request<HoldingDetail>(`/portfolio/holdings/${ticker}`),
   performance: (range: PerformanceRange) =>
     request<Performance>('/portfolio/performance', { query: { range } }),
@@ -54,16 +57,16 @@ export const market = {
 
 export const ai = {
   /** Feature 1. Returns a draft for confirmation — never writes. */
-  parseTransaction: (text: string) =>
+  parseTransaction: (text: string, language: AppLocale = 'en') =>
     request<ParseTransactionResponse>('/ai/parse-transaction', {
-      method: 'POST', body: { text },
+      method: 'POST', body: { text, language },
     }),
 
   /** Feature 2. Omit conversationId to start a new conversation. */
-  chat: (message: string, conversationId?: number) =>
+  chat: (message: string, conversationId?: number, language: AppLocale = 'en') =>
     request<ChatResponse>('/ai/chat', {
       method: 'POST',
-      body: conversationId ? { conversationId, message } : { message },
+      body: conversationId ? { conversationId, message, language } : { message, language },
     }),
 
   conversations: () => request<Page<Conversation>>('/ai/conversations'),

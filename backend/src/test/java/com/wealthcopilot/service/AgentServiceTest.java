@@ -121,6 +121,20 @@ class AgentServiceTest {
     }
 
     @Test
+    void chat_chineseLocaleUsesChineseSystemPrompt() {
+        when(llmClient.complete(messagesCaptor.capture(), anyList(), eq(false)))
+                .thenReturn(new LlmResult("这是中文回答。", List.of()));
+
+        ChatResponse response = agentService.chat(USER_ID, null, "我的最大持仓是什么？", "zh-CN");
+
+        assertEquals("这是中文回答。", response.reply());
+        LlmMessage system = messagesCaptor.getValue().get(0);
+        assertTrue(system.content().contains("所有自然语言输出"));
+        assertTrue(system.content().contains("只使用简体中文"));
+        assertTrue(system.content().contains(LocalDate.now(FIXED_CLOCK).toString()));
+    }
+
+    @Test
     void chat_draftToolSurfacesDraftTransaction() {
         TransactionDraftResponse draft = TransactionDraftResponse.newEntry(
                 "NVDA", TransactionSide.BUY, new BigDecimal("15"),

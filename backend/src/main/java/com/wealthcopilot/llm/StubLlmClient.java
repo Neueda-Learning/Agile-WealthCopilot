@@ -21,6 +21,10 @@ public class StubLlmClient implements LlmClient {
     private static final Pattern QUANTITY_TICKER =
             Pattern.compile("(?i)\\b(bought|buy|sold|sell)\\b\\s+(\\d+(?:\\.\\d+)?)?\\s*([A-Za-z.]{1,10})?");
     private static final Pattern PRICE = Pattern.compile("(?i)\\bat\\s+\\$?(\\d+(?:\\.\\d+)?)");
+    private static final Pattern ZH_QUANTITY_TICKER =
+            Pattern.compile("(买入|购买|卖出)\\s*(\\d+(?:\\.\\d+)?)\\s*股?\\s*([A-Za-z.]{1,10})?");
+    private static final Pattern ZH_PRICE =
+            Pattern.compile("(?:以|每股)\\s*\\$?(\\d+(?:\\.\\d+)?)\\s*(?:美元|元)?");
 
     private final Clock clock;
 
@@ -30,8 +34,11 @@ public class StubLlmClient implements LlmClient {
 
     @Override
     public LlmResult complete(List<LlmMessage> messages, List<LlmToolDefinition> tools, boolean jsonMode) {
+        boolean chinese = messages.stream()
+                .filter(message -> message.role() == LlmMessage.Role.SYSTEM)
+                .anyMatch(message -> message.content().contains("简体中文"));
         if (jsonMode) {
-            return new LlmResult(parseTransactionJson(lastUserContent(messages)), List.of());
+            return new LlmResult(parseTransactionJson(lastUserContent(messages), chinese), List.of());
         }
         boolean hasToolResult = messages.stream()
                 .anyMatch(message -> message.role() == LlmMessage.Role.TOOL);
@@ -47,7 +54,9 @@ public class StubLlmClient implements LlmClient {
                 .map(LlmMessage::content)
                 .orElse("no data");
         return new LlmResult(
-                "Stub answer (no DeepSeek key configured). Portfolio summary: " + toolResult,
+                chinese
+                        ? "离线演示回答（未配置 DeepSeek 密钥）。投资组合摘要：" + toolResult
+                        : "Stub answer (no DeepSeek key configured). Portfolio summary: " + toolResult,
                 List.of());
     }
 
@@ -59,27 +68,29 @@ public class StubLlmClient implements LlmClient {
                 .orElse("");
     }
 
-    private String parseTransactionJson(String text) {
+    private String parseTransactionJson(String text, boolean chinese) {
         String side = null;
         String quantity = null;
         String ticker = null;
-        Matcher matcher = QUANTITY_TICKER.matcher(text);
+        Matcher matcher = (chinese ? ZH_QUANTITY_TICKER : QUANTITY_TICKER).matcher(text);
         if (matcher.find()) {
             String verb = matcher.group(1).toLowerCase(Locale.ROOT);
-            side = verb.startsWith("s") ? "SELL" : "BUY";
+            side = verb.startsWith("s") || verb.contains("卖") ? "SELL" : "BUY";
             quantity = matcher.group(2);
             ticker = matcher.group(3) == null ? null : matcher.group(3).toUpperCase(Locale.ROOT);
         }
-        Matcher priceMatcher = PRICE.matcher(text);
+        Matcher priceMatcher = (chinese ? ZH_PRICE : PRICE).matcher(text);
         String price = priceMatcher.find() ? priceMatcher.group(1) : null;
-        String date = text.toLowerCase(Locale.ROOT).contains("yesterday")
+        String date = text.toLowerCase(Locale.ROOT).contains("yesterday") || text.contains("昨天")
                 ? LocalDate.now(clock).minusDays(1).toString()
                 : LocalDate.now(clock).toString();
 
         return """
                 {"ticker": %s, "side": %s, "quantity": %s, "price": %s, "tradeDate": %s, \
-                "confidence": "LOW", "warnings": ["Parsed by offline stub"]}"""
-                .formatted(json(ticker), json(side), quantity, price, json(date));
+                "confidence": "LOW", "warnings": [%s]}"""
+                .formatted(
+                        json(ticker), json(side), quantity, price, json(date),
+                        json(chinese ? "由离线演示解析器处理" : "Parsed by offline stub"));
     }
 
     private String json(String value) {

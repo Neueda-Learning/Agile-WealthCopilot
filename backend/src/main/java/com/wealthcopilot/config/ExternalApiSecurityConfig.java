@@ -1,5 +1,7 @@
 package com.wealthcopilot.config;
 
+import static org.springframework.security.config.Customizer.withDefaults;
+
 import com.wealthcopilot.security.ApiKeyAuthenticationFilter;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
@@ -35,6 +37,7 @@ public class ExternalApiSecurityConfig {
         return http
                 .securityMatcher("/api/v1/external/**")
                 .csrf(csrf -> csrf.disable())
+                .cors(withDefaults())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers(HttpMethod.GET, "/api/v1/external/health").permitAll()

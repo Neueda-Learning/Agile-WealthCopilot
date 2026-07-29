@@ -48,6 +48,25 @@ public class TransactionParseService {
               return all-null fields with confidence "LOW".
             """;
 
+    private static final String ZH_SYSTEM_PROMPT_TEMPLATE = """
+            你需要从用户的句子中提取股票或 ETF 交易信息。
+            今天是 %s（%s）。仅返回一个 JSON 对象，不要输出任何说明文字：
+            {"ticker": string|null, "side": "BUY"|"SELL"|null, "quantity": number|null,
+             "price": number|null, "tradeDate": "YYYY-MM-DD"|null,
+             "confidence": "HIGH"|"MEDIUM"|"LOW", "warnings": [string]}
+            规则：
+            - 将公司名称映射为其主要美国股票代码（例如“Nvidia”映射为“NVDA”），
+              并在 warnings 中用简体中文说明该映射。
+            - 根据今天的日期解析相对日期（如“昨天”“上周二”），并在 warnings
+              中用简体中文说明解析结果。
+            - 用户没有明确提供的内容必须使用 null。绝不能猜测原文中没有出现的
+              数量、价格或日期。
+            - quantity 和 price 如果存在，必须是正数。
+            - 如果文本不是在记录股票或 ETF 的买入或卖出交易，则所有字段返回 null，
+              confidence 返回 "LOW"。
+            - warnings 中的所有自然语言内容必须只使用简体中文。
+            """;
+
     private final LlmClient llmClient;
     private final MarketDataService marketDataService;
     private final ObjectMapper objectMapper;
@@ -66,7 +85,12 @@ public class TransactionParseService {
     }
 
     public ParseTransactionResponse parse(String text) {
-        JsonNode extraction = extractWithRetry(text);
+        return parse(text, "en");
+    }
+
+    public ParseTransactionResponse parse(String text, String language) {
+        boolean chinese = "zh-CN".equals(language);
+        JsonNode extraction = extractWithRetry(text, chinese);
 
         List<String> warnings = new ArrayList<>();
         JsonNode modelWarnings = extraction.path("warnings");
@@ -82,11 +106,13 @@ public class TransactionParseService {
                 ? extraction.path("ticker").asText().trim().toUpperCase(Locale.ROOT)
                 : null;
 
-        requireCompleteDraft(ticker, side, quantity, price, tradeDate);
-        String resolvedTicker = verifyTicker(ticker, warnings);
+        requireCompleteDraft(ticker, side, quantity, price, tradeDate, chinese);
+        String resolvedTicker = verifyTicker(ticker, warnings, chinese);
 
         if (tradeDate.isAfter(LocalDate.now(clock))) {
-            warnings.add("Trade date " + tradeDate + " is in the future — please double-check.");
+            warnings.add(chinese
+                    ? "交易日期 " + tradeDate + " 在未来，请再次确认。"
+                    : "Trade date " + tradeDate + " is in the future — please double-check.");
         }
 
         String confidence = switch (extraction.path("confidence").asText("MEDIUM")) {
@@ -101,11 +127,13 @@ public class TransactionParseService {
                 List.copyOf(warnings));
     }
 
-    private JsonNode extractWithRetry(String text) {
+    private JsonNode extractWithRetry(String text, boolean chinese) {
         LocalDate today = LocalDate.now(clock);
-        String systemPrompt = SYSTEM_PROMPT_TEMPLATE.formatted(
+        String promptTemplate = chinese ? ZH_SYSTEM_PROMPT_TEMPLATE : SYSTEM_PROMPT_TEMPLATE;
+        Locale promptLocale = chinese ? Locale.SIMPLIFIED_CHINESE : Locale.ENGLISH;
+        String systemPrompt = promptTemplate.formatted(
                 today,
-                today.format(DateTimeFormatter.ofPattern("EEEE", Locale.ENGLISH)));
+                today.format(DateTimeFormatter.ofPattern("EEEE", promptLocale)));
         List<LlmMessage> messages = List.of(
                 LlmMessage.system(systemPrompt),
                 LlmMessage.user(text));
@@ -128,7 +156,9 @@ public class TransactionParseService {
             throw new AiUnavailableException("The AI service is unavailable", lastFailure);
         }
         throw new AiParseFailedException(
-                "Could not understand that as a transaction. Try e.g. \"bought 15 NVDA at 142 last Tuesday\".");
+                chinese
+                        ? "无法将这段话识别为交易。请尝试输入，例如“上周二以 142 美元买入 15 股 NVDA”。"
+                        : "Could not understand that as a transaction. Try e.g. \"bought 15 NVDA at 142 last Tuesday\".");
     }
 
     private JsonNode tryReadJson(String content) {
@@ -188,46 +218,54 @@ public class TransactionParseService {
             TransactionSide side,
             BigDecimal quantity,
             BigDecimal price,
-            LocalDate tradeDate
+            LocalDate tradeDate,
+            boolean chinese
     ) {
         List<String> missing = new ArrayList<>();
         if (ticker == null || ticker.isBlank()) {
-            missing.add("which stock or ETF (ticker or company name)");
+            missing.add(chinese ? "股票或 ETF（代码或公司名称）" : "which stock or ETF (ticker or company name)");
         }
         if (side == null) {
-            missing.add("whether you bought or sold");
+            missing.add(chinese ? "买入还是卖出" : "whether you bought or sold");
         }
         if (quantity == null) {
-            missing.add("the number of shares");
+            missing.add(chinese ? "股数" : "the number of shares");
         }
         if (price == null) {
-            missing.add("the price per share");
+            missing.add(chinese ? "每股价格" : "the price per share");
         }
         if (tradeDate == null) {
-            missing.add("the trade date");
+            missing.add(chinese ? "交易日期" : "the trade date");
         }
         if (!missing.isEmpty()) {
             throw new AiParseFailedException(
-                    "Almost there — please also include " + String.join(", ", missing)
-                            + ", then parse again.");
+                    chinese
+                            ? "快完成了，请补充" + String.join("、", missing) + "，然后重新解析。"
+                            : "Almost there — please also include " + String.join(", ", missing)
+                                    + ", then parse again.");
         }
     }
 
-    private String verifyTicker(String ticker, List<String> warnings) {
+    private String verifyTicker(String ticker, List<String> warnings, boolean chinese) {
         List<SymbolSearchResponse> matches;
         try {
             matches = marketDataService.search(ticker);
         } catch (RuntimeException exception) {
             // Symbol search being down should not block the draft — saving re-validates.
-            warnings.add("Could not verify ticker " + ticker + " right now; it will be checked on save.");
+            warnings.add(chinese
+                    ? "目前无法验证股票代码 " + ticker + "，保存时会再次检查。"
+                    : "Could not verify ticker " + ticker + " right now; it will be checked on save.");
             return ticker;
         }
         boolean known = matches.stream()
                 .anyMatch(match -> ticker.equalsIgnoreCase(match.ticker()));
         if (!known) {
             throw new AiParseFailedException(
-                    "\"" + ticker + "\" doesn't match a known US ticker. "
-                            + "Try the exact symbol (e.g. NVDA) or the full company name.");
+                    chinese
+                            ? "“" + ticker + "”与已知的美国股票代码不匹配。"
+                                    + "请尝试输入准确代码（如 NVDA）或完整公司名称。"
+                            : "\"" + ticker + "\" doesn't match a known US ticker. "
+                                    + "Try the exact symbol (e.g. NVDA) or the full company name.");
         }
         return ticker;
     }

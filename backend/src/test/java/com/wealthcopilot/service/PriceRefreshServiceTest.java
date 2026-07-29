@@ -87,6 +87,30 @@ class PriceRefreshServiceTest {
         assertEquals(2, queue.size());
     }
 
+    @Test
+    void refreshInstrumentsNow_refreshesEveryRequestedInstrumentImmediately() {
+        List<Instrument> instruments = List.of(
+                instrument(1L, "AAPL"),
+                instrument(2L, "MSFT"),
+                instrument(3L, "NVDA"));
+        when(marketDataClient.fetchQuotes(List.of("AAPL", "MSFT", "NVDA")))
+                .thenReturn(quotes(List.of("AAPL", "MSFT", "NVDA")));
+        when(priceCacheRepository.findByInstrumentId(any(Long.class))).thenReturn(Optional.empty());
+        when(instrumentRepository.findById(any(Long.class))).thenAnswer(invocation -> {
+            Long id = invocation.getArgument(0);
+            return Optional.of(instruments.get(id.intValue() - 1));
+        });
+
+        PriceRefreshService.RefreshResult result =
+                refreshService.refreshInstrumentsNow(instruments);
+
+        assertEquals(3, result.requested());
+        assertEquals(3, result.refreshed());
+        assertEquals(List.of(), result.failedTickers());
+        verify(marketDataClient).fetchQuotes(List.of("AAPL", "MSFT", "NVDA"));
+        verify(priceCacheRepository, times(3)).save(any());
+    }
+
     private Map<String, MarketDataClient.MarketQuote> quotes(List<String> tickers) {
         Map<String, MarketDataClient.MarketQuote> quotes = new LinkedHashMap<>();
         for (String ticker : tickers) {

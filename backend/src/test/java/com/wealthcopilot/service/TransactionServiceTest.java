@@ -47,6 +47,35 @@ class TransactionServiceTest {
     private TransactionService transactionService;
 
     @Test
+    void listTransactions_filtersByCaseInsensitiveTickerPrefix() {
+        Long userId = 7L;
+        Transaction apple = tx(
+                1L,
+                userId,
+                instrument("AAPL", "USD"),
+                TransactionSide.BUY,
+                "3",
+                "200",
+                "0",
+                "2026-07-28");
+        when(transactionRepository
+                .findAllByUserIdAndInstrumentTickerStartingWithIgnoreCaseOrderByTradeDateAscIdAsc(
+                        userId,
+                        "aa"))
+                .thenReturn(List.of(apple));
+
+        List<TransactionResponse> result =
+                transactionService.listTransactions(userId, "  aa  ", null, null);
+
+        assertEquals(1, result.size());
+        assertEquals("AAPL", result.get(0).ticker());
+        verify(transactionRepository)
+                .findAllByUserIdAndInstrumentTickerStartingWithIgnoreCaseOrderByTradeDateAscIdAsc(
+                        userId,
+                        "aa");
+    }
+
+    @Test
     void createTransaction_savesWhenValidUsdAndBalancedTimeline() {
         Long userId = 7L;
         Instrument instrument = instrument("NVDA", "USD");

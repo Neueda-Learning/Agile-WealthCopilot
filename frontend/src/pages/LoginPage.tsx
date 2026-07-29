@@ -3,9 +3,12 @@ import { Link } from 'react-router-dom';
 import { Banner, Button, Card, Input, Wordmark } from '../design-system';
 import { ApiError } from '../api/client';
 import { useAuth } from '../context/AuthContext';
+import { useLocale } from '../context/LocaleContext';
+import LanguageSwitch from '../components/LanguageSwitch';
 
 export default function LoginPage() {
   const { login } = useAuth();
+  const { t } = useLocale();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
@@ -21,8 +24,8 @@ export default function LoginPage() {
       // 401 here means bad credentials, not an expired session.
       setError(
         err instanceof ApiError && err.status === 401
-          ? 'That email and password do not match. Check both and try again.'
-          : err instanceof ApiError ? err.message : 'Sign in failed.',
+          ? t('That email and password do not match. Check both and try again.', '邮箱或密码不正确，请检查后重试。')
+          : err instanceof ApiError ? err.message : t('Sign in failed.', '登录失败。'),
       );
     } finally {
       setBusy(false);
@@ -31,28 +34,29 @@ export default function LoginPage() {
 
   return (
     <div className="auth-page">
+      <div className="auth-language"><LanguageSwitch /></div>
       <div className="auth-card stack-sm">
         <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 'var(--space-3)' }}>
           <Wordmark size={26} />
         </div>
-        <Card title="Sign in" subtitle="Track your portfolio and ask Copilot about it.">
+        <Card title={t('Sign in', '登录')} subtitle={t('Track your portfolio and ask Copilot about it.', '跟踪您的投资组合并向智能助手提问。')}>
           <form onSubmit={submit} className="stack-sm">
-            {error && <Banner tone="loss" title="Cannot sign in">{error}</Banner>}
+            {error && <Banner tone="loss" title={t('Cannot sign in', '无法登录')}>{error}</Banner>}
             <Input
-              label="Email" type="email" autoComplete="email" required
+              label={t('Email', '电子邮箱')} type="email" autoComplete="email" required
               value={email} onChange={(e) => setEmail(e.target.value)}
             />
             <Input
-              label="Password" type="password" autoComplete="current-password" required
+              label={t('Password', '密码')} type="password" autoComplete="current-password" required
               value={password} onChange={(e) => setPassword(e.target.value)}
             />
             <Button type="submit" fullWidth disabled={busy || !email || !password}>
-              {busy ? 'Signing in…' : 'Sign in'}
+              {busy ? t('Signing in…', '正在登录…') : t('Sign in', '登录')}
             </Button>
           </form>
         </Card>
         <div style={{ textAlign: 'center', fontSize: 'var(--fs-sm)', color: 'var(--text-muted)' }}>
-          No account yet? <Link to="/register">Create one</Link>
+          {t('No account yet?', '还没有账户？')} <Link to="/register">{t('Create one', '创建账户')}</Link>
         </div>
       </div>
     </div>

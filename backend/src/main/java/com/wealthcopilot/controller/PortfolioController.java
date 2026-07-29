@@ -3,13 +3,16 @@ package com.wealthcopilot.controller;
 import com.wealthcopilot.dto.response.HoldingResponse;
 import com.wealthcopilot.dto.response.PerformanceSummaryResponse;
 import com.wealthcopilot.dto.response.PortfolioSummaryResponse;
+import com.wealthcopilot.dto.response.PriceRefreshResponse;
 import com.wealthcopilot.exception.DomainValidationException;
+import com.wealthcopilot.service.HoldingPriceRefreshService;
 import com.wealthcopilot.service.PortfolioService;
 import java.time.LocalDate;
 import java.util.List;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -19,9 +22,14 @@ import org.springframework.web.bind.annotation.RestController;
 public class PortfolioController {
 
     private final PortfolioService portfolioService;
+    private final HoldingPriceRefreshService priceRefreshService;
 
-    public PortfolioController(PortfolioService portfolioService) {
+    public PortfolioController(
+            PortfolioService portfolioService,
+            HoldingPriceRefreshService priceRefreshService
+    ) {
         this.portfolioService = portfolioService;
+        this.priceRefreshService = priceRefreshService;
     }
 
     @GetMapping("/summary")
@@ -32,6 +40,11 @@ public class PortfolioController {
     @GetMapping("/holdings")
     public List<HoldingResponse> holdings(@RequestAttribute("userId") Long userId) {
         return portfolioService.getHoldings(userId);
+    }
+
+    @PostMapping("/holdings/refresh")
+    public PriceRefreshResponse refreshHoldings(@RequestAttribute("userId") Long userId) {
+        return priceRefreshService.refreshHeldPrices(userId);
     }
 
     @GetMapping("/performance")

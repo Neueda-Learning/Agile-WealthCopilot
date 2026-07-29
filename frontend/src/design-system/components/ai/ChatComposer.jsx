@@ -7,6 +7,7 @@ export function ChatComposer({
   hint = 'Copilot reads your holdings. It cannot place trades.',
   submitLabel = 'Ask', suggestions = [], onSuggestion, disabled = false, className = '', ...rest
 }) {
+  const zh = document.documentElement.lang === 'zh-CN';
   return (
     <div className={'wc-composer ' + className} {...rest}>
       <textarea className="wc-composer__input" value={value} placeholder={placeholder} disabled={disabled}
@@ -25,7 +26,7 @@ export function ChatComposer({
       <div className="wc-composer__row">
         <span className="wc-composer__hint">{hint}</span>
         <span style={{ flex: 1 }} />
-        <IconButton icon="paperclip" label="Attach statement" size="sm" />
+        <IconButton icon="paperclip" label={zh ? '附加对账单' : 'Attach statement'} size="sm" />
         <Button size="sm" iconRight="arrow-up" onClick={onSubmit} disabled={disabled || !value}>{submitLabel}</Button>
       </div>
     </div>

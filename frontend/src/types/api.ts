@@ -111,6 +111,13 @@ export interface HoldingDetail extends Holding {
   transactions: Transaction[];
 }
 
+export interface PriceRefreshResult {
+  requested: number;
+  refreshed: number;
+  failedTickers: string[];
+  completedAt: string;
+}
+
 export interface Performance {
   range: PerformanceRange;
   from: string;

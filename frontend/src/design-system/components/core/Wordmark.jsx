@@ -1,14 +1,19 @@
 import React from 'react';
 
-/* WealthCopilot has no supplied logo mark. The brand signature is the wordmark
-   set in Public Sans Bold with a rotated square accent. Do not substitute a
-   drawn logo — render this. */
+/* Shared brand signature used by auth screens and the application sidebar. */
 export function Wordmark({ size = 18, showDot = true, monochrome = false, className = '', ...rest }) {
-  const d = Math.round(size * 0.42);
+  const logoSize = Math.round(size * 1.5);
   return (
     <span className={'wc-wordmark ' + className} style={{ fontSize: size }} {...rest}>
       {showDot ? (
-        <span className="wc-wordmark__dot" style={{ width: d, height: d, background: monochrome ? 'currentColor' : undefined }} />
+        <img
+          className={'wc-wordmark__logo' + (monochrome ? ' wc-wordmark__logo--monochrome' : '')}
+          src="/wealthcopilot-logo.png"
+          width={logoSize}
+          height={logoSize}
+          alt=""
+          aria-hidden="true"
+        />
       ) : null}
       <span>Wealth<em>Copilot</em></span>
     </span>
