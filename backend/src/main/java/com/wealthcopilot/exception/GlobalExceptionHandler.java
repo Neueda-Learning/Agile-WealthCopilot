@@ -59,6 +59,18 @@ public class GlobalExceptionHandler {
                 request);
     }
 
+    @ExceptionHandler(DomainValidationException.class)
+    ResponseEntity<ApiErrorResponse> handleDomainValidation(
+            DomainValidationException exception,
+            HttpServletRequest request) {
+        return error(
+                HttpStatus.BAD_REQUEST,
+                "VALIDATION_FAILED",
+                exception.getMessage(),
+                List.of(),
+                request);
+    }
+
     @ExceptionHandler(InvalidCredentialsException.class)
     ResponseEntity<ApiErrorResponse> handleInvalidCredentials(
             InvalidCredentialsException exception,

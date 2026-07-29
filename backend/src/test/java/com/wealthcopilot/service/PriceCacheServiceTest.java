@@ -38,6 +38,9 @@ class PriceCacheServiceTest {
     @Mock
     private PriceRefreshQueue refreshQueue;
 
+    @Mock
+    private PriceRefreshService priceRefreshService;
+
     private PriceCacheService priceCacheService;
 
     @BeforeEach
@@ -48,6 +51,7 @@ class PriceCacheServiceTest {
                 priceCacheRepository,
                 instrumentRepository,
                 refreshQueue,
+                priceRefreshService,
                 properties,
                 clock
         );
@@ -96,7 +100,7 @@ class PriceCacheServiceTest {
         when(instrumentRepository.findByTickerIgnoreCase("NVDA")).thenReturn(Optional.of(instrument));
 
         assertTrue(priceCacheService.getLatestQuote("NVDA").isEmpty());
-        verify(refreshQueue).enqueue(instrument);
+        verify(priceRefreshService).refreshInstrument(instrument);
     }
 
     @Test
@@ -113,7 +117,7 @@ class PriceCacheServiceTest {
         when(priceCacheRepository.findByInstrumentId(1L)).thenReturn(Optional.empty());
 
         assertThrows(MarketDataUnavailableException.class, () -> priceCacheService.getQuote("NVDA"));
-        verify(refreshQueue).enqueue(instrument);
+        verify(priceRefreshService).refreshInstrument(instrument);
     }
 
     private Instrument instrument() {

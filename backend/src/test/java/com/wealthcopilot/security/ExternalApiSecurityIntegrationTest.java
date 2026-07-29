@@ -32,9 +32,10 @@ class ExternalApiSecurityIntegrationTest {
     }
 
     @Test
-    void marketEndpoints_areNotProtectedByExternalApiKeyChain() throws Exception {
+    void marketEndpoints_requireJwtRatherThanAnExternalApiKey() throws Exception {
         mockMvc.perform(get("/api/v1/market/quote/NOPE"))
-                .andExpect(status().isNotFound());
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.code").value("UNAUTHORIZED"));
     }
 
     @Test

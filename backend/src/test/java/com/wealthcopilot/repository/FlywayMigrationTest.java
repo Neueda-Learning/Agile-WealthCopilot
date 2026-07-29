@@ -26,7 +26,7 @@ class FlywayMigrationTest {
 
         MigrateResult result = flyway.migrate();
 
-        assertEquals(2, result.migrationsExecuted);
+        assertEquals(3, result.migrationsExecuted);
 
         try (Connection connection = DriverManager.getConnection(DATABASE_URL, "sa", "")) {
             DatabaseMetaData metadata = connection.getMetaData();
