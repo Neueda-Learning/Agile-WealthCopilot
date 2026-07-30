@@ -1,73 +1,85 @@
 # Simon — Presentation Script
 **Role:** Platform, Authentication & Security  
-**Slides:** 01 Title · 02 Team & Ownership · 03 User Problem · (Demo step 01)  
-**Total mic time:** ≈ 3 min 35 sec
+**Slides:** 01 Product Positioning · 02 Team · 03 Project Management & CI · 04 Target Users & Needs · (Demo step 01)
+**Total mic time:** ≈ 3 min 25 sec
 
 ---
 
-## Slide 01 · Title — *WealthCopilot* (0:25)
+## Slide 01 · Product Positioning — *WealthCopilot* (0:40)
 
 > **[Open on the title slide. Pause one beat, then speak.]**
 
 "WealthCopilot is not a trading platform.
-It is an explainable, verifiable personal investment recorder.
+It is an explainable personal investment tracker.
 
-Three things make it different:
-portfolio math that is deterministic and auditable,
-market data that never blocks the user even when the provider is slow,
-and an AI layer that always waits for human confirmation before writing anything.
+It records transactions, calculates portfolio performance, and helps users
+understand the results.
 
-In the next twelve minutes we will walk through the value story.
-The final three minutes will be a live demonstration of a real user path."
+Compared with a spreadsheet, it validates the investment history.
+Compared with a brokerage app, it explains the portfolio but does not execute
+trades. Compared with general AI, it uses verified portfolio records and keeps
+the user in control.
+
+In short, we record, calculate and explain.
+We do not move money, predict prices or give investment advice."
 
 ---
 
-## Slide 02 · Team & Ownership — *Four owners. One integrated delivery path.* (1:00)
+## Slide 02 · Team — *Four people. Clear ownership.* (0:35)
 
 > **[Advance to slide 02.]**
 
-"Our team built this along four clear ownership boundaries.
+"Our team built the product with four clear areas of ownership.
 
-I'm Simon — I own the **platform foundation**: the Spring Boot application, JWT authentication, BCrypt password storage, and per-user data isolation.
-My work was the first to land, which let the other three modules develop in parallel against stable API and service interfaces.
+I am Simon. I own the platform foundation, authentication and security.
+Ezio owns the transaction flow and portfolio calculation engine.
+Tony owns market data, the external API and testing.
+Jasper owns the React frontend and both AI features.
 
-Ezio owns the **domain core** — the transaction lifecycle and the portfolio engine that derives every P&L number.
-
-Tony owns **reliability** — market data, the external API security framework, and the test infrastructure that validates every integration point.
-
-Jasper owns the **user experience** — the React frontend and both AI features.
-
-Every module eventually calls the same service layer.
-That is intentional, and I will show you why the boundaries hold when we reach the security slide."
+Each person had a clear module, but all modules work together through the same
+backend services."
 
 ---
 
-## Slide 03 · The User Problem — *Investment information is fragmented—and hard to trust.* (1:45)
+## Slide 03 · Project Management & CI — *Visible work. Reviewed changes.* (0:40)
 
 > **[Advance to slide 03.]**
 
-"The problem we are solving is not 'missing a stock screen.'
-It is that investment information is fragmented across tools that do not trust each other.
+"We used Jira to manage the project.
+Every task had an owner and moved from To Do, to In Progress, to In Review and
+then Done. This made our progress and blockers visible.
 
-**Records** — most people track trades in spreadsheets or notes.
-There is no validation that a sale cannot exceed what you actually held on that date.
-There is no safe edit that re-checks history.
+For the code, each change was made on a branch and opened as a pull request.
+GitHub Actions then ran Backend CI and Frontend CI. The backend ran Maven tests
+and verification. The frontend ran its type-check and production build.
 
-**Prices** — live market data is slow, rate-limited, or offline.
-If your portfolio view depends entirely on a real-time API call, a flaky provider takes down your entire experience.
+CI checked the code automatically, and one teammate reviewed it before the
+change was merged."
 
-**Questions** — users want plain-language answers about their own money.
-But handing an AI agent unrestricted write access to financial records is not safe.
+---
 
-That gap — between what users need and what fragmented tools give them — is exactly what WealthCopilot closes.
+## Slide 04 · Target Users & Needs — *Clarity for self-directed investors.* (1:05)
 
-And I want to be explicit about the **product boundary**: we record, we calculate, we explain.
-We do not move money, we do not predict prices, and we do not output buy or sell advice.
-That boundary is a deliberate design decision, not a missing feature."
+> **[Advance to slide 04.]**
+
+"Our target users are everyday, self-directed investors.
+They may own a few stocks or ETFs and keep their own records. They are not
+professional traders.
+
+The problem is not a missing stock screen.
+Investment information is fragmented across different tools.
+
+Users need four things: a reliable transaction history, portfolio numbers they
+can understand, plain-language answers, and control when AI is involved.
+
+Today, these needs are split across spreadsheets, market-data pages, brokerage
+apps and general AI tools. This creates manual work and makes the numbers harder
+to trust."
 
 > **[Hand off to Ezio.]**
 
-"Ezio will now show you how we solve these three problems in one product."
+"Ezio will now show you how WealthCopilot brings these needs into one clear
+portfolio journey."
 
 ---
 
