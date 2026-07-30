@@ -4,7 +4,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="WealthCopilot high-level final presentation: 12-minute story, 3-minute demo, balanced across four presenters.">
+  <meta name="description" content="WealthCopilot high-level final presentation with a live product demonstration.">
   <title>WealthCopilot · 15-minute team presentation</title>
   <style>
     :root {
@@ -43,12 +43,11 @@
     button { font: inherit; }
 
     .deck-shell {
-      position: relative;
+      position: fixed;
+      inset: 0;
       width: 100%;
       height: 100%;
-      display: grid;
-      place-items: center;
-      padding: 28px;
+      overflow: hidden;
       background:
         radial-gradient(circle at 15% 10%, rgba(47, 91, 211, .14), transparent 28%),
         radial-gradient(circle at 90% 90%, rgba(35, 167, 199, .12), transparent 30%),
@@ -56,14 +55,18 @@
     }
 
     .deck {
-      position: relative;
-      width: min(calc(100vw - 56px), calc((100vh - 56px) * 16 / 9));
-      aspect-ratio: 16 / 9;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 1280px;
+      height: 720px;
       overflow: hidden;
       border: 1px solid rgba(15, 23, 42, .08);
       border-radius: 18px;
       background: var(--paper);
       box-shadow: var(--shadow);
+      transform: translate(-50%, -50%) scale(var(--deck-scale, 1));
+      transform-origin: center;
     }
 
     .slide {
@@ -71,8 +74,8 @@
       inset: 0;
       display: grid;
       grid-template-rows: auto 1fr auto;
-      gap: clamp(12px, 1.5vw, 28px);
-      padding: clamp(34px, 4vw, 72px);
+      gap: 19px;
+      padding: 51px;
       opacity: 0;
       visibility: hidden;
       transform: translateX(36px) scale(.985);
@@ -133,7 +136,7 @@
       gap: 10px;
       margin: 0;
       color: var(--blue);
-      font-size: clamp(11px, 1vw, 16px);
+      font-size: 13px;
       font-weight: 800;
       letter-spacing: .12em;
       text-transform: uppercase;
@@ -147,35 +150,6 @@
       height: 3px;
       border-radius: 99px;
       background: currentColor;
-    }
-
-    .owner-chip {
-      display: inline-flex;
-      align-items: center;
-      gap: 9px;
-      flex: 0 0 auto;
-      padding: 8px 12px;
-      border: 1px solid var(--line);
-      border-radius: 999px;
-      background: rgba(255,255,255,.76);
-      color: var(--muted);
-      font-size: clamp(10px, .9vw, 14px);
-      font-weight: 700;
-      backdrop-filter: blur(8px);
-    }
-
-    [data-theme="dark"] .owner-chip {
-      color: #dbe7ff;
-      border-color: rgba(255,255,255,.18);
-      background: rgba(255,255,255,.08);
-    }
-
-    .owner-dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      background: var(--owner, var(--blue));
-      box-shadow: 0 0 0 4px color-mix(in srgb, var(--owner, var(--blue)) 18%, transparent);
     }
 
     .slide-body {
@@ -195,55 +169,62 @@
     h1 {
       max-width: 980px;
       margin-bottom: 20px;
-      font-size: clamp(44px, 5.8vw, 92px);
+      font-size: 74px;
       line-height: .98;
       letter-spacing: -.05em;
     }
 
     h2 {
       max-width: 1100px;
-      margin-bottom: clamp(18px, 2vw, 32px);
-      font-size: clamp(34px, 4.4vw, 70px);
+      margin-bottom: 26px;
+      font-size: 56px;
       line-height: 1.02;
       letter-spacing: -.045em;
     }
 
     h3 {
       margin-bottom: 10px;
-      font-size: clamp(18px, 1.7vw, 28px);
+      font-size: 22px;
       line-height: 1.12;
+    }
+
+    .title-slide h1 {
+      max-width: none;
+      margin-bottom: 28px;
+      color: var(--ink);
+      font-size: 96px;
+      line-height: 1;
+      white-space: nowrap;
+    }
+
+    .title-slide .lede {
+      max-width: 1040px;
+      color: var(--muted);
+      font-size: 28px;
+      line-height: 1.42;
     }
 
     .lede {
       max-width: 900px;
       margin-bottom: 0;
       color: var(--muted);
-      font-size: clamp(19px, 2vw, 32px);
+      font-size: 26px;
       line-height: 1.35;
     }
 
     [data-theme="dark"] .lede { color: #bdc9df; }
-
-    .accent { color: var(--blue); }
-    [data-theme="dark"] .accent { color: #8fb0ff; }
 
     .slide-foot {
       position: relative;
       z-index: 1;
       display: flex;
       align-items: flex-end;
-      justify-content: space-between;
-      gap: 20px;
+      justify-content: flex-end;
       color: var(--muted);
-      font-size: clamp(10px, .9vw, 14px);
+      font-size: 12px;
     }
 
     [data-theme="dark"] .slide-foot { color: #93a4c2; }
-
-    .talkline {
-      max-width: 850px;
-      font-weight: 650;
-    }
 
     .slide-number {
       font-variant-numeric: tabular-nums;
@@ -251,16 +232,14 @@
       letter-spacing: .08em;
     }
 
-    .hero-grid,
     .two-col,
     .three-col,
     .four-col {
       display: grid;
-      gap: clamp(14px, 1.5vw, 24px);
+      gap: 19px;
       align-items: stretch;
     }
 
-    .hero-grid { grid-template-columns: 1.05fr .95fr; align-items: center; }
     .two-col { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     .three-col { grid-template-columns: repeat(3, minmax(0, 1fr)); }
     .four-col { grid-template-columns: repeat(4, minmax(0, 1fr)); }
@@ -268,7 +247,7 @@
     .card {
       position: relative;
       overflow: hidden;
-      padding: clamp(18px, 1.8vw, 30px);
+      padding: 23px;
       border: 1px solid var(--line);
       border-radius: var(--radius-lg);
       background: rgba(255,255,255,.88);
@@ -287,7 +266,7 @@
       display: block;
       margin-bottom: 12px;
       color: var(--card-accent, var(--blue));
-      font-size: clamp(10px, .9vw, 14px);
+      font-size: 12px;
       font-weight: 800;
       letter-spacing: .08em;
       text-transform: uppercase;
@@ -296,7 +275,7 @@
     .card p,
     .card li {
       color: var(--muted);
-      font-size: clamp(13px, 1.15vw, 18px);
+      font-size: 15px;
       line-height: 1.42;
     }
 
@@ -330,7 +309,7 @@
 
     .team-card .name {
       margin-bottom: 6px;
-      font-size: clamp(24px, 2.15vw, 34px);
+      font-size: 28px;
       letter-spacing: -.03em;
     }
 
@@ -338,25 +317,16 @@
       min-height: 46px;
       margin-bottom: 14px;
       color: var(--card-accent);
-      font-size: clamp(14px, 1.2vw, 19px);
+      font-size: 15px;
       font-weight: 750;
       line-height: 1.25;
-    }
-
-    .team-card .mic-time {
-      margin-top: auto;
-      padding-top: 16px;
-      border-top: 1px solid var(--line);
-      color: var(--ink);
-      font-size: clamp(11px, 1vw, 15px);
-      font-weight: 800;
     }
 
     .problem-card .big-word {
       display: block;
       margin-bottom: 10px;
       color: var(--card-accent);
-      font-size: clamp(30px, 3vw, 48px);
+      font-size: 38px;
       font-weight: 850;
       letter-spacing: -.04em;
     }
@@ -366,12 +336,12 @@
       align-items: center;
       justify-content: space-between;
       gap: 20px;
-      margin-top: clamp(18px, 2vw, 30px);
+      margin-top: 26px;
       padding: 18px 22px;
       border-radius: var(--radius-md);
       background: var(--blue-soft);
       color: var(--blue-dark);
-      font-size: clamp(15px, 1.3vw, 20px);
+      font-size: 17px;
       font-weight: 750;
     }
 
@@ -387,7 +357,7 @@
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      padding: clamp(20px, 2.1vw, 34px);
+      padding: 27px;
       border-radius: var(--radius-xl);
       background: var(--card);
       border: 1px solid var(--line);
@@ -395,26 +365,26 @@
 
     .journey-step .index {
       color: var(--blue);
-      font-size: clamp(13px, 1.2vw, 18px);
+      font-size: 15px;
       font-weight: 850;
     }
 
     .journey-step strong {
       display: block;
       margin: 18px 0 10px;
-      font-size: clamp(28px, 3vw, 48px);
+      font-size: 38px;
       letter-spacing: -.04em;
     }
 
     .journey-step span:last-child {
       color: var(--muted);
-      font-size: clamp(14px, 1.2vw, 19px);
+      font-size: 15px;
       line-height: 1.38;
     }
 
     .journey-arrow {
       color: var(--blue);
-      font-size: clamp(26px, 3vw, 48px);
+      font-size: 38px;
       font-weight: 900;
     }
 
@@ -426,7 +396,7 @@
     }
 
     .engine-node {
-      padding: clamp(20px, 2.2vw, 34px);
+      padding: 28px;
       border-radius: var(--radius-xl);
       border: 1px solid var(--line);
       background: white;
@@ -434,7 +404,7 @@
     }
 
     .engine-node.primary {
-      padding-block: clamp(30px, 3vw, 48px);
+      padding-block: 38px;
       border-color: rgba(47,91,211,.36);
       background: var(--blue-soft);
     }
@@ -443,7 +413,7 @@
       display: block;
       margin: 10px 0;
       color: var(--blue);
-      font-size: clamp(20px, 2.4vw, 36px);
+      font-size: 31px;
       font-weight: 850;
       letter-spacing: -.03em;
     }
@@ -451,7 +421,7 @@
     .engine-node p {
       margin: 0;
       color: var(--muted);
-      font-size: clamp(13px, 1.15vw, 18px);
+      font-size: 15px;
       line-height: 1.4;
     }
 
@@ -467,7 +437,7 @@
       border: 1px solid var(--line);
       border-radius: var(--radius-md);
       background: rgba(255,255,255,.75);
-      font-size: clamp(12px, 1.05vw, 16px);
+      font-size: 13px;
       font-weight: 700;
     }
 
@@ -476,7 +446,7 @@
     .advantage-grid {
       display: grid;
       grid-template-columns: 1.1fr .9fr;
-      gap: clamp(18px, 2vw, 30px);
+      gap: 26px;
     }
 
     .big-advantage {
@@ -484,7 +454,7 @@
       display: flex;
       flex-direction: column;
       justify-content: flex-end;
-      padding: clamp(26px, 3vw, 50px);
+      padding: 38px;
       border-radius: var(--radius-xl);
       background:
         linear-gradient(145deg, rgba(47,91,211,.96), rgba(23,59,154,.98));
@@ -494,7 +464,7 @@
     .big-advantage .quote {
       max-width: 660px;
       margin: 0;
-      font-size: clamp(31px, 3.8vw, 60px);
+      font-size: 49px;
       line-height: 1.02;
       font-weight: 850;
       letter-spacing: -.045em;
@@ -503,7 +473,7 @@
     .big-advantage small {
       margin-top: 20px;
       color: #c9d8ff;
-      font-size: clamp(13px, 1.15vw, 18px);
+      font-size: 15px;
       line-height: 1.45;
     }
 
@@ -522,64 +492,174 @@
     .advantage-item b {
       display: block;
       margin-bottom: 5px;
-      font-size: clamp(16px, 1.4vw, 22px);
+      font-size: 18px;
     }
 
     .advantage-item span {
       color: var(--muted);
-      font-size: clamp(12px, 1.05vw, 16px);
+      font-size: 13px;
       line-height: 1.38;
     }
 
     .stack-visual {
       display: grid;
-      grid-template-columns: .9fr 1.2fr .9fr;
-      gap: 16px;
+      grid-template-columns: 1fr 74px 1.18fr 74px 1fr;
+      gap: 10px;
       align-items: stretch;
     }
 
-    .stack-column {
-      display: grid;
-      gap: 12px;
-    }
-
-    .stack-layer {
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      min-height: 86px;
-      padding: 16px 18px;
+    .stack-zone {
+      min-height: 338px;
+      padding: 14px;
       border: 1px solid var(--line);
-      border-radius: var(--radius-md);
-      background: white;
+      border-radius: 20px;
+      background: rgba(255, 255, 255, .82);
     }
 
-    .stack-layer.highlight {
+    .stack-zone.frontend {
+      border-top: 5px solid #087ea4;
+      background: linear-gradient(180deg, #f4fbfd 0%, rgba(255,255,255,.9) 100%);
+    }
+
+    .stack-zone.backend {
+      border-top: 5px solid var(--blue);
+      background: linear-gradient(180deg, #f2f5ff 0%, rgba(255,255,255,.92) 100%);
+    }
+
+    .stack-zone.external {
+      border-top: 5px solid #6b58d9;
+      background: linear-gradient(180deg, #f7f5ff 0%, rgba(255,255,255,.92) 100%);
+    }
+
+    .stack-zone-title {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+      color: var(--ink);
+      font-size: 15px;
+      font-weight: 900;
+      letter-spacing: .09em;
+      text-transform: uppercase;
+    }
+
+    .stack-zone-title small {
+      color: var(--muted);
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: .06em;
+    }
+
+    .stack-zone-body {
+      display: grid;
+      gap: 10px;
+    }
+
+    .tech-card,
+    .system-card {
+      padding: 12px 14px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: white;
+      box-shadow: 0 6px 16px rgba(16, 32, 59, .05);
+    }
+
+    .tech-card.highlight {
       color: white;
       border-color: transparent;
       background: linear-gradient(145deg, var(--blue), var(--blue-dark));
+      box-shadow: 0 10px 24px rgba(47, 91, 211, .2);
     }
 
-    .stack-layer strong {
-      font-size: clamp(16px, 1.4vw, 22px);
-    }
-
-    .stack-layer span {
-      margin-top: 5px;
+    .tech-card-label {
+      display: block;
+      margin-bottom: 7px;
       color: var(--muted);
-      font-size: clamp(11px, 1vw, 15px);
-      line-height: 1.35;
+      font-size: 10px;
+      font-weight: 900;
+      letter-spacing: .1em;
+      text-transform: uppercase;
     }
 
-    .stack-layer.highlight span { color: #cfdbff; }
+    .tech-card.highlight .tech-card-label {
+      color: #cfdbff;
+    }
 
-    .flow-line {
+    .tech-row {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      min-height: 34px;
+    }
+
+    .tech-row + .tech-row {
+      margin-top: 6px;
+      padding-top: 6px;
+      border-top: 1px solid rgba(16, 32, 59, .08);
+    }
+
+    .tech-card.highlight .tech-row + .tech-row {
+      border-top-color: rgba(255, 255, 255, .18);
+    }
+
+    .tech-row strong {
+      font-size: 17px;
+      line-height: 1.15;
+    }
+
+    .tech-logo {
+      width: 28px;
+      height: 28px;
+      padding: 4px;
+      flex: 0 0 auto;
+      object-fit: contain;
+      border: 1px solid rgba(16, 32, 59, .08);
+      border-radius: 8px;
+      background: #f7f9fc;
+      box-shadow: 0 3px 8px rgba(16, 32, 59, .07);
+    }
+
+    .tech-card.highlight .tech-logo {
+      border-color: rgba(255, 255, 255, .3);
+      background: white;
+      box-shadow: 0 3px 10px rgba(0, 0, 0, .13);
+    }
+
+    .tech-logo.wide {
+      width: 31px;
+    }
+
+    .system-card {
       display: flex;
       align-items: center;
       justify-content: center;
-      color: var(--blue);
-      font-size: clamp(12px, 1.1vw, 16px);
+      min-height: 52px;
+      color: var(--ink);
+      font-size: 15px;
       font-weight: 800;
+      text-align: center;
+    }
+
+    .stack-interface {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      color: var(--blue);
+      text-align: center;
+    }
+
+    .stack-interface .interface-arrow {
+      font-size: 25px;
+      font-weight: 800;
+      line-height: 1;
+    }
+
+    .stack-interface strong {
+      font-size: 11px;
+      line-height: 1.25;
+      letter-spacing: .02em;
     }
 
     .cache-flow {
@@ -594,7 +674,7 @@
       display: flex;
       flex-direction: column;
       justify-content: center;
-      padding: clamp(20px, 2.2vw, 34px);
+      padding: 28px;
       border: 1px solid var(--line);
       border-radius: var(--radius-xl);
       background: white;
@@ -607,20 +687,20 @@
     }
 
     .cache-node .node-title {
-      font-size: clamp(20px, 2vw, 32px);
+      font-size: 26px;
       font-weight: 850;
     }
 
     .cache-node .node-meta {
       margin-top: 10px;
       color: var(--muted);
-      font-size: clamp(12px, 1.1vw, 17px);
+      font-size: 14px;
       line-height: 1.4;
     }
 
     .cache-arrow {
       color: var(--blue);
-      font-size: clamp(24px, 2.7vw, 42px);
+      font-size: 35px;
       font-weight: 900;
     }
 
@@ -634,7 +714,7 @@
       border-radius: var(--radius-md);
       background: #eef3ff;
       color: #294a9a;
-      font-size: clamp(13px, 1.15vw, 18px);
+      font-size: 15px;
       font-weight: 700;
     }
 
@@ -664,21 +744,21 @@
     .trust-card .trust-number {
       float: right;
       color: #c9d5ef;
-      font-size: clamp(32px, 3vw, 48px);
+      font-size: 38px;
       font-weight: 850;
     }
 
     .trust-card strong {
       display: block;
       margin-bottom: 8px;
-      font-size: clamp(18px, 1.6vw, 25px);
+      font-size: 20px;
     }
 
     .trust-card p {
       max-width: 86%;
       margin: 0;
       color: var(--muted);
-      font-size: clamp(12px, 1.05vw, 16px);
+      font-size: 13px;
       line-height: 1.4;
     }
 
@@ -842,7 +922,7 @@
 
     .ai-step {
       min-height: 200px;
-      padding: clamp(20px, 2vw, 30px);
+      padding: 26px;
       border: 1px solid var(--line);
       border-radius: var(--radius-xl);
       background: white;
@@ -855,7 +935,7 @@
 
     .ai-step .ai-label {
       color: var(--blue);
-      font-size: clamp(11px, 1vw, 15px);
+      font-size: 13px;
       font-weight: 850;
       letter-spacing: .08em;
       text-transform: uppercase;
@@ -864,7 +944,7 @@
     .ai-step strong {
       display: block;
       margin: 18px 0 10px;
-      font-size: clamp(24px, 2.4vw, 38px);
+      font-size: 31px;
       line-height: 1.06;
       letter-spacing: -.04em;
     }
@@ -872,189 +952,153 @@
     .ai-step p {
       margin: 0;
       color: var(--muted);
-      font-size: clamp(12px, 1.05vw, 16px);
+      font-size: 13px;
       line-height: 1.4;
     }
 
     .ai-arrow {
       color: var(--blue);
-      font-size: clamp(22px, 2.5vw, 38px);
+      font-size: 32px;
       font-weight: 900;
     }
 
     .agent-grid {
       display: grid;
-      grid-template-columns: 1fr .9fr;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
       gap: 24px;
     }
 
-    .tool-cloud {
-      display: flex;
-      flex-wrap: wrap;
-      align-content: center;
-      gap: 10px;
-      min-height: 270px;
-      padding: 24px;
-      border: 1px solid var(--line);
-      border-radius: var(--radius-xl);
-      background: white;
-    }
-
-    .tool-pill {
-      padding: 10px 13px;
-      border: 1px solid #ccd7ee;
-      border-radius: 999px;
-      background: #f7f9ff;
-      color: #304d91;
-      font-size: clamp(11px, 1vw, 15px);
-      font-weight: 750;
-    }
-
-    .guardrail-panel {
+    .capability-panel {
       display: flex;
       flex-direction: column;
-      justify-content: center;
-      min-height: 270px;
-      padding: clamp(24px, 2.5vw, 38px);
+      min-height: 326px;
+      padding: 28px 30px;
+      border: 1px solid var(--line);
       border-radius: var(--radius-xl);
-      background: linear-gradient(145deg, #101d41, #172a5c);
+      background: rgba(255,255,255,.9);
+      box-shadow: 0 14px 34px rgba(15,23,42,.06);
+    }
+
+    .capability-panel.cans {
+      border-top: 5px solid #1e8c63;
+      background: linear-gradient(180deg, #f3fbf7 0%, rgba(255,255,255,.94) 100%);
+    }
+
+    .capability-panel.cants {
+      border-top: 5px solid #c54b4b;
+      background: linear-gradient(180deg, #fff7f7 0%, rgba(255,255,255,.94) 100%);
+    }
+
+    .capability-heading {
+      display: flex;
+      align-items: center;
+      gap: 13px;
+      margin-bottom: 19px;
+    }
+
+    .capability-mark {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
       color: white;
+      font-size: 20px;
+      font-weight: 900;
     }
 
-    .guardrail-panel .shield {
-      width: 44px;
-      height: 50px;
-      margin-bottom: 18px;
-      border: 4px solid #8fb0ff;
-      border-radius: 22px 22px 28px 28px;
-      clip-path: polygon(50% 0, 100% 18%, 90% 75%, 50% 100%, 10% 75%, 0 18%);
-    }
+    .cans .capability-mark { background: #1e8c63; }
+    .cants .capability-mark { background: #c54b4b; }
 
-    .guardrail-panel strong {
-      font-size: clamp(26px, 2.6vw, 42px);
-      line-height: 1.05;
+    .capability-heading h3 {
+      margin: 0;
+      font-size: 33px;
+      line-height: 1;
       letter-spacing: -.04em;
     }
 
-    .guardrail-panel ul {
+    .capability-list {
       display: grid;
-      gap: 9px;
-      margin: 18px 0 0;
-      padding-left: 20px;
-      color: #c8d6f4;
-      font-size: clamp(13px, 1.1vw, 17px);
-      line-height: 1.4;
-    }
-
-    .demo-grid {
-      display: grid;
-      grid-template-columns: 1.2fr .8fr;
-      gap: 24px;
-    }
-
-    .demo-timeline {
-      display: grid;
-      gap: 10px;
-    }
-
-    .demo-step {
-      display: grid;
-      grid-template-columns: 64px 110px 1fr auto;
-      gap: 14px;
-      align-items: center;
-      min-height: 70px;
-      padding: 12px 16px;
-      border: 1px solid var(--line);
-      border-radius: var(--radius-md);
-      background: white;
-    }
-
-    .demo-step .demo-index {
-      color: var(--blue);
-      font-size: clamp(18px, 1.7vw, 26px);
-      font-weight: 850;
-    }
-
-    .demo-step .demo-owner {
-      font-weight: 850;
-    }
-
-    .demo-step .demo-action {
-      color: var(--muted);
-      font-size: clamp(12px, 1.05vw, 16px);
-      line-height: 1.3;
-    }
-
-    .demo-step .demo-time {
-      padding: 6px 9px;
-      border-radius: 999px;
-      background: var(--blue-soft);
-      color: var(--blue-dark);
-      font-size: clamp(10px, .9vw, 13px);
-      font-weight: 850;
-    }
-
-    .demo-clock {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      min-height: 350px;
-      padding: 30px;
-      border-radius: var(--radius-xl);
-      background: linear-gradient(145deg, var(--blue), var(--blue-dark));
-      color: white;
-      text-align: center;
-    }
-
-    .demo-clock .clock-label {
-      color: #cbd9ff;
-      font-size: clamp(11px, 1vw, 15px);
-      font-weight: 800;
-      letter-spacing: .12em;
-      text-transform: uppercase;
-    }
-
-    .demo-clock .clock-value {
-      margin: 14px 0;
-      font-size: clamp(68px, 8vw, 120px);
-      font-weight: 850;
-      letter-spacing: -.06em;
-      font-variant-numeric: tabular-nums;
-    }
-
-    .demo-clock p {
+      gap: 11px;
       margin: 0;
-      color: #d9e3ff;
-      font-size: clamp(13px, 1.1vw, 17px);
-      line-height: 1.4;
+      padding: 0;
+      list-style: none;
     }
 
-    .closing {
+    .capability-list li {
+      position: relative;
+      padding: 11px 14px 11px 42px;
+      border: 1px solid rgba(15,23,42,.07);
+      border-radius: 12px;
+      background: rgba(255,255,255,.78);
+      color: var(--ink);
+      font-size: 14px;
+      font-weight: 680;
+      line-height: 1.32;
+    }
+
+    .capability-list li::before {
+      position: absolute;
+      left: 14px;
+      top: 10px;
+      font-size: 16px;
+      font-weight: 900;
+    }
+
+    .cans .capability-list li::before {
+      content: "✓";
+      color: #1e8c63;
+    }
+
+    .cants .capability-list li::before {
+      content: "×";
+      color: #c54b4b;
+    }
+
+    .demo-transition {
+      background:
+        radial-gradient(circle at 92% 18%, rgba(47,91,211,.09), transparent 34%),
+        linear-gradient(135deg, rgba(255,255,255,.98), rgba(247,249,253,.98)),
+        var(--paper);
+      color: var(--ink);
+    }
+
+    .demo-transition-grid {
       display: grid;
-      grid-template-columns: 1.2fr .8fr;
-      gap: 36px;
-      align-items: end;
+      grid-template-columns: .68fr 1.32fr;
+      gap: 51px;
+      align-items: center;
     }
 
-    .closing h2 {
-      margin-bottom: 18px;
-      font-size: clamp(52px, 7vw, 108px);
+    .demo-transition-copy h2 {
+      max-width: 520px;
+      margin-bottom: 24px;
+      font-size: 80px;
+      line-height: .94;
+      white-space: nowrap;
     }
 
-    .closing-points {
-      display: grid;
-      gap: 12px;
+    .demo-transition-line {
+      margin: 0;
+      color: var(--blue);
+      font-size: 21px;
+      font-weight: 750;
+      letter-spacing: .02em;
     }
 
-    .closing-point {
-      padding: 16px 18px;
-      border: 1px solid rgba(255,255,255,.14);
-      border-radius: var(--radius-md);
-      background: rgba(255,255,255,.07);
-      color: #dbe6ff;
-      font-size: clamp(14px, 1.2vw, 19px);
-      font-weight: 700;
+    .demo-preview {
+      border-color: var(--line);
+      box-shadow: 0 28px 70px rgba(16, 32, 59, .16);
+    }
+
+    .demo-preview .app-frame {
+      min-height: 420px;
+    }
+
+    .demo-preview .app-title,
+    .demo-preview .mini-value {
+      color: var(--ink);
     }
 
     .controls {
@@ -1099,21 +1143,6 @@
       color: white;
     }
 
-    .control-divider {
-      width: 1px;
-      height: 22px;
-      background: var(--line);
-    }
-
-    .global-timer {
-      min-width: 95px;
-      color: #42506a;
-      text-align: center;
-      font-size: 12px;
-      font-weight: 850;
-      font-variant-numeric: tabular-nums;
-    }
-
     .progress-track {
       position: fixed;
       z-index: 20;
@@ -1129,50 +1158,6 @@
       height: 100%;
       background: linear-gradient(90deg, var(--blue), var(--cyan));
       transition: width .3s ease;
-    }
-
-    .notes-panel {
-      position: fixed;
-      z-index: 30;
-      top: 20px;
-      right: 20px;
-      width: min(440px, calc(100vw - 40px));
-      max-height: calc(100vh - 100px);
-      overflow: auto;
-      padding: 24px;
-      border: 1px solid rgba(15,23,42,.12);
-      border-radius: var(--radius-lg);
-      background: rgba(255,255,255,.96);
-      box-shadow: 0 24px 70px rgba(15,23,42,.22);
-      transform: translateX(calc(100% + 40px));
-      transition: transform .28s ease;
-      backdrop-filter: blur(14px);
-    }
-
-    .notes-panel.open { transform: translateX(0); }
-
-    .notes-panel h3 {
-      margin-bottom: 6px;
-      font-size: 22px;
-    }
-
-    .notes-meta {
-      margin-bottom: 16px;
-      color: var(--blue);
-      font-size: 13px;
-      font-weight: 800;
-    }
-
-    .notes-content {
-      color: #46546b;
-      font-size: 15px;
-      line-height: 1.58;
-    }
-
-    .notes-content ul {
-      display: grid;
-      gap: 8px;
-      padding-left: 20px;
     }
 
     .keyboard-help {
@@ -1230,9 +1215,6 @@
     }
 
     @media (max-width: 900px) {
-      .deck-shell { padding: 10px; }
-      .deck { width: calc(100vw - 20px); }
-      .slide { padding: 28px; }
       .controls { bottom: 8px; }
     }
 
@@ -1254,12 +1236,16 @@
       }
 
       .deck {
+        position: relative;
+        top: auto;
+        left: auto;
         width: auto;
         height: auto;
         overflow: visible;
         border: 0;
         border-radius: 0;
         box-shadow: none;
+        transform: none;
       }
 
       .slide {
@@ -1274,57 +1260,35 @@
 
       .controls,
       .progress-track,
-      .notes-panel,
       .keyboard-help { display: none !important; }
     }
 
     @media (prefers-reduced-motion: reduce) {
       .slide,
-      .progress-fill,
-      .notes-panel { transition: none; }
+      .progress-fill { transition: none; }
     }
   </style>
 </head>
 <body>
   <main class="deck-shell">
     <div class="deck" id="deck" aria-live="polite">
-      <section class="slide active" data-owner="Simon" data-duration="25" data-theme="dark" style="--owner:#8fb0ff" aria-label="Title">
-        <header class="slide-head">
-          <p class="eyebrow">WealthCopilot</p>
-          <span class="owner-chip"><i class="owner-dot"></i> Simon · 0:25</span>
-        </header>
+      <section class="slide active title-slide" aria-label="Title">
+        <header class="slide-head" aria-hidden="true"></header>
         <div class="slide-body">
-          <div class="hero-grid">
-            <div>
-              <h1>Personal investing,<br><span class="accent">made explainable.</span></h1>
-              <p class="lede">A secure portfolio tracker with deterministic P&amp;L, resilient market data and AI that stays under human control.</p>
-            </div>
-            <div class="big-advantage" style="min-height:360px;background:linear-gradient(145deg,rgba(255,255,255,.14),rgba(255,255,255,.05));border:1px solid rgba(255,255,255,.16)">
-              <p class="quote" style="font-size:clamp(28px,3.2vw,52px)">Record.<br>Understand.<br>Ask.</p>
-              <small>One journey from raw transactions to an explainable portfolio conversation.</small>
-            </div>
-          </div>
+          <h1>WealthCopilot</h1>
+          <p class="lede">A secure, explainable portfolio tracker with deterministic P&amp;L, resilient market data, and human-controlled AI.</p>
         </div>
         <footer class="slide-foot">
-          <span class="talkline">Final project · 11:20 story + 3:00 demo + 0:40 handoffs</span>
-          <span class="slide-number">01 / 14</span>
+          <span class="slide-number">01 / 12</span>
         </footer>
-        <aside class="speaker-notes">
-          <ul>
-            <li>开场只讲一句：WealthCopilot 不是交易平台，而是一个“可解释、可验证”的个人投资记录工具。</li>
-            <li>强调三件事：确定性的投资组合计算、不会阻塞用户的缓存行情、必须人工确认的 AI。</li>
-            <li>告诉评委：前 12 分钟讲高层价值，最后 3 分钟走一条真实用户路径。</li>
-          </ul>
-        </aside>
       </section>
 
       <section class="slide" data-owner="Simon" data-duration="60" style="--owner:#2f5bd3" aria-label="Team and ownership">
         <header class="slide-head">
           <p class="eyebrow">Team &amp; ownership</p>
-          <span class="owner-chip"><i class="owner-dot"></i> Simon · 1:00</span>
         </header>
         <div class="slide-body">
-          <h2>Four owners. One integrated delivery path.</h2>
+          <h2>Team Ownership</h2>
           <div class="four-col">
             <article class="card team-card" style="--card-accent:#2f5bd3">
               <span class="card-kicker">Foundation</span>
@@ -1335,7 +1299,6 @@
                 <li>JWT + BCrypt</li>
                 <li>Per-user isolation</li>
               </ul>
-              <div class="mic-time">≈ 3:35 total mic time</div>
             </article>
             <article class="card team-card" style="--card-accent:#1e8c63">
               <span class="card-kicker">Domain</span>
@@ -1346,7 +1309,6 @@
                 <li>Average cost basis</li>
                 <li>Realized / unrealized P&amp;L</li>
               </ul>
-              <div class="mic-time">≈ 3:35 total mic time</div>
             </article>
             <article class="card team-card" style="--card-accent:#ba7420">
               <span class="card-kicker">Reliability</span>
@@ -1357,7 +1319,6 @@
                 <li>API-key framework</li>
                 <li>Test infrastructure</li>
               </ul>
-              <div class="mic-time">≈ 3:35 total mic time</div>
             </article>
             <article class="card team-card" style="--card-accent:#8b5cf6">
               <span class="card-kicker">Experience</span>
@@ -1368,30 +1329,20 @@
                 <li>AI transaction draft</li>
                 <li>Portfolio Copilot</li>
               </ul>
-              <div class="mic-time">≈ 3:35 total mic time</div>
             </article>
           </div>
         </div>
         <footer class="slide-foot">
-          <span class="talkline">Interfaces were agreed first; each module has a clear owner and handoff.</span>
-          <span class="slide-number">02 / 14</span>
+          <span class="slide-number">02 / 12</span>
         </footer>
-        <aside class="speaker-notes">
-          <ul>
-            <li>按“基础、领域、可靠性、体验”介绍四个人，不逐条念任务。</li>
-            <li>解释 Simon 的基础工作先落地，其他模块通过 API / service interface 并行开发。</li>
-            <li>总发言时间包含 Demo，四个人都约 3 分 35 秒，避免一个人讲大部分内容。</li>
-          </ul>
-        </aside>
       </section>
 
       <section class="slide" data-owner="Simon" data-duration="105" style="--owner:#2f5bd3" aria-label="User problem">
         <header class="slide-head">
           <p class="eyebrow">The user problem</p>
-          <span class="owner-chip"><i class="owner-dot"></i> Simon · 1:45</span>
         </header>
         <div class="slide-body">
-          <h2>Investment information is fragmented—and hard to trust.</h2>
+          <h2>Trust Concern</h2>
           <div class="three-col">
             <article class="card problem-card" style="--card-accent:#c64a64">
               <span class="big-word">Records</span>
@@ -1412,25 +1363,16 @@
           </div>
         </div>
         <footer class="slide-foot">
-          <span class="talkline">The product boundary is part of the solution—not a missing feature.</span>
-          <span class="slide-number">03 / 14</span>
+          <span class="slide-number">03 / 12</span>
         </footer>
-        <aside class="speaker-notes">
-          <ul>
-            <li>用户问题不是“缺一个股票页面”，而是交易、行情和问题分散在不同工具中。</li>
-            <li>如果只接实时 API，外部服务故障会让核心产品不可用；如果让 AI 直接写入，又会带来不可控风险。</li>
-            <li>明确边界：系统记录和解释，不移动资金、不预测价格、不输出买卖建议。</li>
-          </ul>
-        </aside>
       </section>
 
       <section class="slide" data-owner="Ezio" data-duration="55" style="--owner:#1e8c63" aria-label="Solution journey">
         <header class="slide-head">
           <p class="eyebrow">How we solve it</p>
-          <span class="owner-chip"><i class="owner-dot"></i> Ezio · 0:55</span>
         </header>
         <div class="slide-body">
-          <h2>One product. Three jobs to be done.</h2>
+          <h2>Product Journey</h2>
           <div class="journey">
             <article class="journey-step">
               <span class="index">01</span>
@@ -1458,25 +1400,16 @@
           </div>
         </div>
         <footer class="slide-foot">
-          <span class="talkline">The AI layer explains the deterministic core; it does not replace it.</span>
-          <span class="slide-number">04 / 14</span>
+          <span class="slide-number">04 / 12</span>
         </footer>
-        <aside class="speaker-notes">
-          <ul>
-            <li>用一条用户路径解释产品：先记录，再计算，再对话。</li>
-            <li>强调所有入口最终都走同一套 TransactionService 和 PortfolioService。</li>
-            <li>这样手工录入、AI 草稿和 Copilot 得到的是一致的业务结果。</li>
-          </ul>
-        </aside>
       </section>
 
       <section class="slide" data-owner="Ezio" data-duration="80" style="--owner:#1e8c63" aria-label="Portfolio engine">
         <header class="slide-head">
           <p class="eyebrow">The deterministic core</p>
-          <span class="owner-chip"><i class="owner-dot"></i> Ezio · 1:20</span>
         </header>
         <div class="slide-body">
-          <h2>Every portfolio number starts with a validated timeline.</h2>
+          <h2>Portfolio Calculation</h2>
           <div class="engine">
             <article class="engine-node">
               <h3>Transaction timeline</h3>
@@ -1501,27 +1434,18 @@
           </div>
         </div>
         <footer class="slide-foot">
-          <span class="talkline">Average cost keeps v1 understandable; FIFO tax lots are an explicit future choice.</span>
-          <span class="slide-number">05 / 14</span>
+          <span class="slide-number">05 / 12</span>
         </footer>
-        <aside class="speaker-notes">
-          <ul>
-            <li>简单解释平均成本，不需要推公式：买入更新数量和平均成本，卖出按当时平均成本计算 realized P&amp;L。</li>
-            <li>关键业务规则：任何历史修改都要重新验证之后的卖出，不能出现“当时持仓不足”。</li>
-            <li>强调 PortfolioMath 是纯计算，易于单元测试，也更容易向用户解释。</li>
-          </ul>
-        </aside>
       </section>
 
       <section class="slide" data-owner="Ezio" data-duration="35" style="--owner:#1e8c63" aria-label="Core product advantages">
         <header class="slide-head">
           <p class="eyebrow">Why this core is stronger</p>
-          <span class="owner-chip"><i class="owner-dot"></i> Ezio · 0:35</span>
         </header>
         <div class="slide-body">
           <div class="advantage-grid">
             <div class="big-advantage">
-              <p class="quote">Correct first.<br>Fast second.<br>AI third.</p>
+              <p class="quote">Core Principles</p>
               <small>The portfolio remains useful even when the LLM or market-data provider is unavailable.</small>
             </div>
             <div class="advantage-list">
@@ -1541,84 +1465,110 @@
           </div>
         </div>
         <footer class="slide-foot">
-          <span class="talkline">Handoff: the engine is dependable because the surrounding platform is resilient.</span>
-          <span class="slide-number">06 / 14</span>
+          <span class="slide-number">06 / 12</span>
         </footer>
-        <aside class="speaker-notes">
-          <ul>
-            <li>这一页只总结优势，不再展开实现。</li>
-            <li>“Correct first, fast second, AI third” 是项目最重要的产品取舍。</li>
-            <li>交给 Tony：下一部分解释这套核心如何被技术架构和行情缓存保护。</li>
-          </ul>
-        </aside>
       </section>
 
       <section class="slide" data-owner="Tony" data-duration="65" style="--owner:#ba7420" aria-label="Architecture and technology stack">
         <header class="slide-head">
           <p class="eyebrow">Architecture &amp; stack</p>
-          <span class="owner-chip"><i class="owner-dot"></i> Tony · 1:05</span>
         </header>
         <div class="slide-body">
-          <h2>A simple full stack with clear boundaries.</h2>
+          <h2>System Architecture</h2>
           <div class="stack-visual">
-            <div class="stack-column">
-              <div class="stack-layer">
-                <strong>React 18 + TypeScript</strong>
-                <span>Vite SPA, responsive UI, JWT client</span>
+            <section class="stack-zone frontend" aria-label="Frontend boundary">
+              <div class="stack-zone-title">Frontend <small>Browser</small></div>
+              <div class="stack-zone-body">
+                <div class="tech-card">
+                  <span class="tech-card-label">Web application</span>
+                  <div class="tech-row">
+                    <img class="tech-logo" src="presentation-assets/tech-logos/react.svg" alt="React logo">
+                    <strong>React 18</strong>
+                  </div>
+                  <div class="tech-row">
+                    <img class="tech-logo" src="presentation-assets/tech-logos/typescript.svg" alt="TypeScript logo">
+                    <strong>TypeScript</strong>
+                  </div>
+                  <div class="tech-row">
+                    <img class="tech-logo" src="presentation-assets/tech-logos/vite.svg" alt="Vite logo">
+                    <strong>Vite</strong>
+                  </div>
+                </div>
+                <div class="system-card">Consumer Experience</div>
               </div>
-              <div class="flow-line">HTTPS + JWT →</div>
-              <div class="stack-layer">
-                <strong>Consumer experience</strong>
-                <span>Dashboard, holdings, transactions, Copilot</span>
-              </div>
+            </section>
+
+            <div class="stack-interface" aria-label="Frontend to backend interface">
+              <span class="interface-arrow">→</span>
+              <strong>HTTP<br>+ JWT</strong>
             </div>
-            <div class="stack-column">
-              <div class="stack-layer highlight">
-                <strong>Spring Boot 3 · Java 17</strong>
-                <span>Controllers → services → repositories</span>
+
+            <section class="stack-zone backend" aria-label="Backend boundary">
+              <div class="stack-zone-title">Backend <small>Server</small></div>
+              <div class="stack-zone-body">
+                <div class="tech-card highlight">
+                  <span class="tech-card-label">Runtime</span>
+                  <div class="tech-row">
+                    <img class="tech-logo" src="presentation-assets/tech-logos/springboot.svg" alt="Spring Boot logo">
+                    <strong>Spring Boot 3</strong>
+                  </div>
+                  <div class="tech-row">
+                    <img class="tech-logo" src="presentation-assets/tech-logos/java.svg" alt="Java logo">
+                    <strong>Java 17</strong>
+                  </div>
+                </div>
+                <div class="system-card">Portfolio + AI Services</div>
+                <div class="tech-card">
+                  <span class="tech-card-label">Data</span>
+                  <div class="tech-row">
+                    <img class="tech-logo wide" src="presentation-assets/tech-logos/mysql.svg" alt="MySQL logo">
+                    <strong>MySQL 8</strong>
+                  </div>
+                  <div class="tech-row">
+                    <img class="tech-logo" src="presentation-assets/tech-logos/flyway.svg" alt="Flyway logo">
+                    <strong>Flyway</strong>
+                  </div>
+                </div>
               </div>
-              <div class="stack-layer">
-                <strong>Portfolio + AI services</strong>
-                <span>Deterministic business rules and bounded tool calls</span>
-              </div>
-              <div class="stack-layer">
-                <strong>MySQL 8 + Flyway</strong>
-                <span>Reproducible schema and user-owned records</span>
-              </div>
+            </section>
+
+            <div class="stack-interface" aria-label="Backend to external API interface">
+              <span class="interface-arrow">↔</span>
+              <strong>API<br>Adapters</strong>
             </div>
-            <div class="stack-column">
-              <div class="stack-layer">
-                <strong>Twelve Data</strong>
-                <span>Quotes and symbol resolution behind a cache</span>
+
+            <section class="stack-zone external" aria-label="External API boundary">
+              <div class="stack-zone-title">External APIs <small>Providers</small></div>
+              <div class="stack-zone-body">
+                <div class="tech-card">
+                  <span class="tech-card-label">Market data</span>
+                  <div class="tech-row">
+                    <img class="tech-logo" src="presentation-assets/tech-logos/twelvedata.png" alt="Twelve Data logo">
+                    <strong>Twelve Data</strong>
+                  </div>
+                </div>
+                <div class="tech-card">
+                  <span class="tech-card-label">AI provider</span>
+                  <div class="tech-row">
+                    <img class="tech-logo" src="presentation-assets/tech-logos/deepseek.svg" alt="DeepSeek logo">
+                    <strong>DeepSeek LLM</strong>
+                  </div>
+                </div>
               </div>
-              <div class="flow-line">← Adapters →</div>
-              <div class="stack-layer">
-                <strong>DeepSeek-compatible LLM</strong>
-                <span>Provider abstraction, structured JSON and tools</span>
-              </div>
-            </div>
+            </section>
           </div>
         </div>
         <footer class="slide-foot">
-          <span class="talkline">Docker Compose reproduces the application and database for local demonstration.</span>
-          <span class="slide-number">07 / 14</span>
+          <span class="slide-number">07 / 12</span>
         </footer>
-        <aside class="speaker-notes">
-          <ul>
-            <li>技术栈只讲一层：React 前端、Spring Boot 后端、MySQL 数据库、Twelve Data 行情、LLM 适配器。</li>
-            <li>不讲类名；强调 controller/service/repository 边界让 UI、AI、外部 API 能复用同一业务层。</li>
-            <li>Flyway 负责数据库版本，Docker Compose 保证演示环境可复现。</li>
-          </ul>
-        </aside>
       </section>
 
       <section class="slide" data-owner="Tony" data-duration="50" style="--owner:#ba7420" aria-label="Market-data resilience">
         <header class="slide-head">
           <p class="eyebrow">Reliable market data</p>
-          <span class="owner-chip"><i class="owner-dot"></i> Tony · 0:50</span>
         </header>
         <div class="slide-body">
-          <h2>External data never blocks the portfolio hot path.</h2>
+          <h2>Market Resilience</h2>
           <div class="cache-flow">
             <article class="cache-node">
               <span class="node-title">Twelve Data</span>
@@ -1641,25 +1591,16 @@
           </div>
         </div>
         <footer class="slide-foot">
-          <span class="talkline">Graceful degradation is a product feature, not only an infrastructure detail.</span>
-          <span class="slide-number">08 / 14</span>
+          <span class="slide-number">08 / 12</span>
         </footer>
-        <aside class="speaker-notes">
-          <ul>
-            <li>组合汇总不会每次请求 Twelve Data；它只读本地 price_cache。</li>
-            <li>定时任务在市场时间刷新持仓相关标的；过期数据仍可返回，但明确标记 stale，并排队刷新。</li>
-            <li>这保证演示时外部行情慢或失败，核心流程仍然可用。</li>
-          </ul>
-        </aside>
       </section>
 
       <section class="slide" data-owner="Tony" data-duration="65" style="--owner:#ba7420" aria-label="Security and quality">
         <header class="slide-head">
           <p class="eyebrow">Trust &amp; delivery evidence</p>
-          <span class="owner-chip"><i class="owner-dot"></i> Tony · 1:05</span>
         </header>
         <div class="slide-body">
-          <h2>Trust is enforced in code—not implied by the UI.</h2>
+          <h2>Security Controls</h2>
           <div class="trust-grid">
             <article class="trust-card">
               <span class="trust-number">01</span>
@@ -1684,31 +1625,92 @@
           </div>
         </div>
         <footer class="slide-foot">
-          <span class="talkline">The API-key security framework is separated from the user-facing JWT chain.</span>
-          <span class="slide-number">09 / 14</span>
+          <span class="slide-number">09 / 12</span>
         </footer>
-        <aside class="speaker-notes">
-          <ul>
-            <li>重点讲“userId 来自 security context，不来自 request parameter”。</li>
-            <li>跨用户资源返回 404，不返回 403，避免暴露资源是否存在。</li>
-            <li>当前代码有独立外部 API 安全链、哈希 API key 基础设施和 health endpoint；不要在 Demo 中声称不存在的 stats/users endpoint 已实现。</li>
-            <li>测试分层：纯数学单测、service 测试、Spring Security / MySQL Testcontainers 集成测试。</li>
-          </ul>
-        </aside>
       </section>
 
-      <section class="slide" data-owner="Jasper" data-duration="35" style="--owner:#8b5cf6" aria-label="Consumer experience">
+      <section class="slide" data-owner="Jasper" data-duration="45" style="--owner:#8b5cf6" aria-label="AI transaction draft">
         <header class="slide-head">
-          <p class="eyebrow">Consumer experience</p>
-          <span class="owner-chip"><i class="owner-dot"></i> Jasper · 0:35</span>
+          <p class="eyebrow">AI feature 1</p>
         </header>
         <div class="slide-body">
-          <div class="two-col" style="grid-template-columns:.72fr 1.28fr;align-items:center">
-            <div>
-              <h2 style="margin-bottom:18px">The UI explains the portfolio at a glance.</h2>
-              <p class="lede" style="font-size:clamp(17px,1.55vw,24px)">Value, cost basis, realized and unrealized P&amp;L, allocation, activity ranges and freshness live in one responsive journey.</p>
+          <h2>AI Transaction Draft</h2>
+          <div class="ai-flow">
+            <article class="ai-step">
+              <span class="ai-label">Describe</span>
+              <strong>“Bought 3 NVDA at 135 yesterday.”</strong>
+              <p>Natural language enters the parsing endpoint.</p>
+            </article>
+            <span class="ai-arrow">→</span>
+            <article class="ai-step review">
+              <span class="ai-label">Review</span>
+              <strong>Structured draft</strong>
+              <p>Ticker, side, quantity, price and date are validated and shown for correction.</p>
+            </article>
+            <span class="ai-arrow">→</span>
+            <article class="ai-step">
+              <span class="ai-label">Confirm</span>
+              <strong>Normal save path</strong>
+              <p>Only explicit user confirmation calls the transaction write endpoint.</p>
+            </article>
+          </div>
+        </div>
+        <footer class="slide-foot">
+          <span class="slide-number">10 / 12</span>
+        </footer>
+      </section>
+
+      <section class="slide" data-owner="Jasper" data-duration="60" style="--owner:#8b5cf6" aria-label="Portfolio agent and guardrails">
+        <header class="slide-head">
+          <p class="eyebrow">AI feature 2</p>
+        </header>
+        <div class="slide-body">
+          <h2>AI Guardrails</h2>
+          <div class="agent-grid">
+            <section class="capability-panel cans" aria-label="AI question answering capabilities">
+              <div class="capability-heading">
+                <span class="capability-mark" aria-hidden="true">✓</span>
+                <h3>Cans</h3>
+              </div>
+              <ul class="capability-list">
+                <li>Summarize portfolio value, cost basis and P&amp;L.</li>
+                <li>Explain personal holdings and transaction history.</li>
+                <li>Retrieve cached quotes and recent stock news.</li>
+                <li>Create transaction drafts for user review.</li>
+                <li>Answer follow-ups within the current conversation.</li>
+              </ul>
+            </section>
+            <section class="capability-panel cants" aria-label="AI question answering limitations">
+              <div class="capability-heading">
+                <span class="capability-mark" aria-hidden="true">×</span>
+                <h3>Can&rsquo;ts</h3>
+              </div>
+              <ul class="capability-list">
+                <li>Predict prices or guarantee investment returns.</li>
+                <li>Recommend what the user should buy or sell.</li>
+                <li>Execute trades, transfer funds or move assets.</li>
+                <li>Write portfolio data without explicit confirmation.</li>
+                <li>Access another user&rsquo;s records or bypass authentication.</li>
+              </ul>
+            </section>
+          </div>
+        </div>
+        <footer class="slide-foot">
+          <span class="slide-number">11 / 12</span>
+        </footer>
+      </section>
+
+      <section class="slide demo-transition" data-demo="true" aria-label="Live demonstration">
+        <header class="slide-head">
+          <p class="eyebrow">Live demo</p>
+        </header>
+        <div class="slide-body">
+          <div class="demo-transition-grid">
+            <div class="demo-transition-copy">
+              <h2>Live Demo</h2>
+              <p class="demo-transition-line">Record → Understand → Ask</p>
             </div>
-            <div class="app-window" aria-label="Stylized dashboard preview">
+            <div class="app-window demo-preview" aria-label="WealthCopilot dashboard preview">
               <div class="window-top"><i class="window-dot"></i><i class="window-dot"></i><i class="window-dot"></i></div>
               <div class="app-frame">
                 <aside class="app-sidebar">
@@ -1738,6 +1740,7 @@
                     <div class="mini-row"><b>Position</b><b>Value</b><b>Today</b></div>
                     <div class="mini-row"><b>AAPL</b><span>$2,153</span><span class="mini-positive">+1.15%</span></div>
                     <div class="mini-row"><b>MSFT</b><span>$2,041</span><span class="mini-positive">+0.82%</span></div>
+                    <div class="mini-row"><b>NVDA</b><span>$856</span><span class="mini-positive">+0.61%</span></div>
                   </div>
                 </div>
               </div>
@@ -1745,210 +1748,19 @@
           </div>
         </div>
         <footer class="slide-foot">
-          <span class="talkline">Confidence and freshness are visible instead of hidden.</span>
-          <span class="slide-number">10 / 14</span>
+          <span class="slide-number">12 / 12</span>
         </footer>
-        <aside class="speaker-notes">
-          <ul>
-            <li>不逐项念 UI，只强调用户第一次进入就能看懂“现在值多少、成本多少、赚亏多少”。</li>
-            <li>Dashboard、Holdings、Transactions、Log transaction、Copilot 是现有 React 路由。</li>
-            <li>UI 对 stale price、加载、空状态和错误都有明确反馈。</li>
-          </ul>
-        </aside>
-      </section>
-
-      <section class="slide" data-owner="Jasper" data-duration="45" style="--owner:#8b5cf6" aria-label="AI transaction draft">
-        <header class="slide-head">
-          <p class="eyebrow">AI feature 1</p>
-          <span class="owner-chip"><i class="owner-dot"></i> Jasper · 0:45</span>
-        </header>
-        <div class="slide-body">
-          <h2>AI accelerates entry—but never bypasses confirmation.</h2>
-          <div class="ai-flow">
-            <article class="ai-step">
-              <span class="ai-label">Describe</span>
-              <strong>“Bought 3 NVDA at 135 yesterday.”</strong>
-              <p>Natural language enters the parsing endpoint.</p>
-            </article>
-            <span class="ai-arrow">→</span>
-            <article class="ai-step review">
-              <span class="ai-label">Review</span>
-              <strong>Structured draft</strong>
-              <p>Ticker, side, quantity, price and date are validated and shown for correction.</p>
-            </article>
-            <span class="ai-arrow">→</span>
-            <article class="ai-step">
-              <span class="ai-label">Confirm</span>
-              <strong>Normal save path</strong>
-              <p>Only explicit user confirmation calls the transaction write endpoint.</p>
-            </article>
-          </div>
-        </div>
-        <footer class="slide-foot">
-          <span class="talkline">Malformed or unavailable AI falls back to the manual form.</span>
-          <span class="slide-number">11 / 14</span>
-        </footer>
-        <aside class="speaker-notes">
-          <ul>
-            <li>AI Feature 1 是低风险入口：LLM 只返回结构化草稿，parse endpoint 永远不写数据库。</li>
-            <li>前端显示抽取字段，让用户修改或确认；真正保存仍走正常 transaction endpoint。</li>
-            <li>Provider 超时、限流或 JSON 错误时，用户可以继续手工填写，不影响核心功能。</li>
-          </ul>
-        </aside>
-      </section>
-
-      <section class="slide" data-owner="Jasper" data-duration="60" style="--owner:#8b5cf6" aria-label="Portfolio agent and guardrails">
-        <header class="slide-head">
-          <p class="eyebrow">AI feature 2</p>
-          <span class="owner-chip"><i class="owner-dot"></i> Jasper · 1:00</span>
-        </header>
-        <div class="slide-body">
-          <h2>The agent can explain and prepare—never decide.</h2>
-          <div class="agent-grid">
-            <div class="tool-cloud" aria-label="Agent tools">
-              <span class="tool-pill">portfolio summary</span>
-              <span class="tool-pill">holdings</span>
-              <span class="tool-pill">transactions</span>
-              <span class="tool-pill">cached quote</span>
-              <span class="tool-pill">invested amount</span>
-              <span class="tool-pill">transaction draft</span>
-              <span class="tool-pill">update draft</span>
-              <span class="tool-pill">stock news</span>
-            </div>
-            <div class="guardrail-panel">
-              <div class="shield" aria-hidden="true"></div>
-              <strong>Structural guardrails</strong>
-              <ul>
-                <li>Every portfolio tool is scoped to the authenticated user.</li>
-                <li>No price prediction or investment advice.</li>
-                <li>No unmediated write tool in the registry.</li>
-                <li>Conversations persist without mixing accounts.</li>
-              </ul>
-            </div>
-          </div>
-        </div>
-        <footer class="slide-foot">
-          <span class="talkline">Prompt rules are reinforced by the capabilities the agent is—and is not—given.</span>
-          <span class="slide-number">12 / 14</span>
-        </footer>
-        <aside class="speaker-notes">
-          <ul>
-            <li>当前代码里 AgentToolExecutor 有 8 类能力：组合汇总、持仓、交易、报价、投入金额、创建草稿、修改草稿、股票新闻。</li>
-            <li>工具调用有迭代上限，最终结果和 tool disclosure 返回前端；消息保存在 conversations/chat_messages。</li>
-            <li>安全不仅依靠 prompt：registry 没有直接写工具，draft 和 update 都必须用户点击确认。</li>
-            <li>把话题自然带到 Demo：现在用 3 分钟证明“记录—理解—提问”的路径。</li>
-          </ul>
-        </aside>
-      </section>
-
-      <section class="slide" data-owner="All four" data-duration="180" data-demo="true" style="--owner:#23a7c7" aria-label="Three-minute live demonstration">
-        <header class="slide-head">
-          <p class="eyebrow">3-minute live demo</p>
-          <span class="owner-chip"><i class="owner-dot"></i> Four presenters · 3:00</span>
-        </header>
-        <div class="slide-body">
-          <h2>One user journey. Four proof points.</h2>
-          <div class="demo-grid">
-            <div class="demo-timeline">
-              <div class="demo-step">
-                <span class="demo-index">01</span>
-                <span class="demo-owner">Simon</span>
-                <span class="demo-action">Sign in and establish the authenticated user.</span>
-                <span class="demo-time">0:25</span>
-              </div>
-              <div class="demo-step">
-                <span class="demo-index">02</span>
-                <span class="demo-owner">Ezio</span>
-                <span class="demo-action">Record a BUY, then show holdings and P&amp;L.</span>
-                <span class="demo-time">0:50</span>
-              </div>
-              <div class="demo-step">
-                <span class="demo-index">03</span>
-                <span class="demo-owner">Jasper</span>
-                <span class="demo-action">Parse a sentence, confirm the draft, ask Copilot one question.</span>
-                <span class="demo-time">1:15</span>
-              </div>
-              <div class="demo-step">
-                <span class="demo-index">04</span>
-                <span class="demo-owner">Tony</span>
-                <span class="demo-action">Point out price freshness and open the external health response.</span>
-                <span class="demo-time">0:30</span>
-              </div>
-            </div>
-            <div class="demo-clock">
-              <span class="clock-label">Demo budget</span>
-              <span class="clock-value" id="demoClock">03:00</span>
-              <p>Press <b>D</b> to jump here.<br>Start the main timer, then switch to the live app.</p>
-            </div>
-          </div>
-        </div>
-        <footer class="slide-foot">
-          <span class="talkline">Fallback: cached prices + local/stub adapters keep the core story available.</span>
-          <span class="slide-number">13 / 14</span>
-        </footer>
-        <aside class="speaker-notes">
-          <ul>
-            <li>Demo 前提前登录第二个浏览器用户，避免现场创建数据耗时；主流程只展示一个用户。</li>
-            <li>Simon：登录成功后一句话说明 JWT；不要停留在表单。</li>
-            <li>Ezio：创建 BUY，立即切到 Dashboard/Holdings 指出 cost basis 与 P&amp;L。</li>
-            <li>Jasper：输入固定句子并确认草稿，再问 “What is my total unrealized gain?”；不要尝试开放式问题。</li>
-            <li>Tony：指出 freshness banner，然后访问 /api/v1/external/health。不要演示当前不存在的 external stats/users endpoint。</li>
-            <li>任何外部服务不稳定时，直接使用缓存行情和 stub 模式，不现场排障。</li>
-          </ul>
-        </aside>
-      </section>
-
-      <section class="slide" data-owner="All four" data-duration="0" data-theme="dark" style="--owner:#8fb0ff" aria-label="Closing">
-        <header class="slide-head">
-          <p class="eyebrow">WealthCopilot</p>
-          <span class="owner-chip"><i class="owner-dot"></i> Close / Q&amp;A</span>
-        </header>
-        <div class="slide-body">
-          <div class="closing">
-            <div>
-              <h2>What to remember.</h2>
-              <p class="lede">A staged MVP, a dependable full stack, and an AI boundary users can understand.</p>
-            </div>
-            <div class="closing-points">
-              <div class="closing-point">Deterministic portfolio math</div>
-              <div class="closing-point">Resilient cached market data</div>
-              <div class="closing-point">User-scoped security by default</div>
-              <div class="closing-point">AI with explicit human confirmation</div>
-            </div>
-          </div>
-        </div>
-        <footer class="slide-foot">
-          <span class="talkline">Questions: Simon—security · Ezio—P&amp;L · Tony—market/tests · Jasper—frontend/AI</span>
-          <span class="slide-number">14 / 14</span>
-        </footer>
-        <aside class="speaker-notes">
-          <ul>
-            <li>Demo 结束后只用一句话收尾，不再重复功能。</li>
-            <li>问题按模块分配：Simon 架构/安全，Ezio 交易/P&amp;L，Tony 行情/测试，Jasper 前端/AI。</li>
-          </ul>
-        </aside>
       </section>
     </div>
   </main>
 
   <nav class="controls" aria-label="Presentation controls">
     <button class="control-button" id="prevButton" type="button" aria-label="Previous slide">←</button>
-    <button class="control-button primary" id="timerButton" type="button" aria-label="Start timer">Start</button>
-    <span class="global-timer" id="globalTimer" aria-label="Presentation timer">00:00 / 15:00</span>
-    <button class="control-button" id="resetButton" type="button" aria-label="Reset timer">Reset</button>
-    <span class="control-divider" aria-hidden="true"></span>
-    <button class="control-button" id="notesButton" type="button" aria-label="Toggle speaker notes">Notes</button>
     <button class="control-button" id="fullButton" type="button" aria-label="Toggle fullscreen">Full</button>
     <button class="control-button" id="nextButton" type="button" aria-label="Next slide">→</button>
   </nav>
 
   <div class="progress-track" aria-hidden="true"><div class="progress-fill" id="progressFill"></div></div>
-
-  <aside class="notes-panel" id="notesPanel" aria-label="Speaker notes">
-    <h3 id="notesTitle">Speaker notes</h3>
-    <div class="notes-meta" id="notesMeta"></div>
-    <div class="notes-content" id="notesContent"></div>
-  </aside>
 
   <div class="keyboard-help" id="keyboardHelp" role="dialog" aria-modal="true" aria-label="Keyboard shortcuts">
     <div class="help-card">
@@ -1956,10 +1768,8 @@
       <p style="color:var(--muted)">This file works offline. Open it in a modern browser and use fullscreen for presenting.</p>
       <div class="shortcut-grid">
         <kbd>← / →</kbd><span>Previous / next slide</span>
-        <kbd>Space</kbd><span>Start or pause the 15-minute timer</span>
-        <kbd>N</kbd><span>Toggle Chinese speaker notes</span>
         <kbd>F</kbd><span>Toggle fullscreen</span>
-        <kbd>D</kbd><span>Jump to the 3-minute demo slide</span>
+        <kbd>D</kbd><span>Jump to the demo slide</span>
         <kbd>Home / End</kbd><span>First / last slide</span>
         <kbd>?</kbd><span>Show or hide this help</span>
       </div>
@@ -1971,61 +1781,28 @@
 
   <script>
     (() => {
+      const deck = document.getElementById("deck");
       const slides = [...document.querySelectorAll(".slide")];
       const progressFill = document.getElementById("progressFill");
       const prevButton = document.getElementById("prevButton");
       const nextButton = document.getElementById("nextButton");
-      const timerButton = document.getElementById("timerButton");
-      const resetButton = document.getElementById("resetButton");
-      const notesButton = document.getElementById("notesButton");
       const fullButton = document.getElementById("fullButton");
-      const globalTimer = document.getElementById("globalTimer");
-      const notesPanel = document.getElementById("notesPanel");
-      const notesTitle = document.getElementById("notesTitle");
-      const notesMeta = document.getElementById("notesMeta");
-      const notesContent = document.getElementById("notesContent");
       const keyboardHelp = document.getElementById("keyboardHelp");
       const closeHelp = document.getElementById("closeHelp");
       const liveStatus = document.getElementById("liveStatus");
-      const demoClock = document.getElementById("demoClock");
 
       let index = 0;
-      let running = false;
-      let elapsedMs = 0;
-      let startedAt = 0;
-      let frame = 0;
-      let demoStartedAt = null;
-      const totalMs = 15 * 60 * 1000;
 
       function clamp(value, min, max) {
         return Math.min(Math.max(value, min), max);
       }
 
-      function formatTime(ms) {
-        const totalSeconds = Math.max(0, Math.floor(ms / 1000));
-        const minutes = Math.floor(totalSeconds / 60);
-        const seconds = totalSeconds % 60;
-        return `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
-      }
-
-      function currentElapsed() {
-        return elapsedMs + (running ? performance.now() - startedAt : 0);
-      }
-
-      function renderTimer() {
-        const current = currentElapsed();
-        globalTimer.textContent = `${formatTime(current)} / 15:00`;
-        globalTimer.style.color = current > totalMs ? "#c64a64" : "#42506a";
-
-        const active = slides[index];
-        if (active.dataset.demo === "true") {
-          if (running && demoStartedAt === null) demoStartedAt = current;
-          const demoElapsed = demoStartedAt === null ? 0 : current - demoStartedAt;
-          demoClock.textContent = formatTime(Math.max(0, 180000 - demoElapsed));
-          demoClock.style.color = demoElapsed > 180000 ? "#ffbac8" : "white";
-        }
-
-        if (running) frame = requestAnimationFrame(renderTimer);
+      function fitDeck() {
+        const scale = Math.min(
+          (window.innerWidth - 56) / 1280,
+          (window.innerHeight - 56) / 720
+        );
+        deck.style.setProperty("--deck-scale", String(Math.max(scale, .1)));
       }
 
       function setSlide(nextIndex) {
@@ -2034,53 +1811,11 @@
         previous.classList.remove("active");
         slides[index].classList.add("active");
 
-        if (slides[index].dataset.demo !== "true") demoStartedAt = null;
-
         progressFill.style.width = `${((index + 1) / slides.length) * 100}%`;
         prevButton.disabled = index === 0;
         nextButton.disabled = index === slides.length - 1;
 
-        const owner = slides[index].dataset.owner || "Team";
-        const duration = Number(slides[index].dataset.duration || 0);
-        const note = slides[index].querySelector(".speaker-notes");
-        notesTitle.textContent = `Slide ${index + 1} · ${slides[index].getAttribute("aria-label")}`;
-        notesMeta.textContent = `${owner}${duration ? ` · target ${formatTime(duration * 1000)}` : ""}`;
-        notesContent.innerHTML = note ? note.innerHTML : "<p>No notes for this slide.</p>";
         liveStatus.textContent = `Slide ${index + 1} of ${slides.length}: ${slides[index].getAttribute("aria-label")}`;
-      }
-
-      function toggleTimer() {
-        if (running) {
-          elapsedMs += performance.now() - startedAt;
-          running = false;
-          cancelAnimationFrame(frame);
-          timerButton.textContent = "Start";
-          timerButton.setAttribute("aria-label", "Resume timer");
-          renderTimer();
-        } else {
-          startedAt = performance.now();
-          running = true;
-          timerButton.textContent = "Pause";
-          timerButton.setAttribute("aria-label", "Pause timer");
-          renderTimer();
-        }
-      }
-
-      function resetTimer() {
-        running = false;
-        elapsedMs = 0;
-        demoStartedAt = null;
-        cancelAnimationFrame(frame);
-        timerButton.textContent = "Start";
-        timerButton.setAttribute("aria-label", "Start timer");
-        demoClock.textContent = "03:00";
-        demoClock.style.color = "white";
-        renderTimer();
-      }
-
-      function toggleNotes() {
-        notesPanel.classList.toggle("open");
-        notesButton.textContent = notesPanel.classList.contains("open") ? "Hide notes" : "Notes";
       }
 
       async function toggleFullscreen() {
@@ -2097,14 +1832,13 @@
 
       prevButton.addEventListener("click", () => setSlide(index - 1));
       nextButton.addEventListener("click", () => setSlide(index + 1));
-      timerButton.addEventListener("click", toggleTimer);
-      resetButton.addEventListener("click", resetTimer);
-      notesButton.addEventListener("click", toggleNotes);
       fullButton.addEventListener("click", toggleFullscreen);
       closeHelp.addEventListener("click", () => keyboardHelp.classList.remove("open"));
+      window.addEventListener("resize", fitDeck, { passive: true });
 
       document.addEventListener("fullscreenchange", () => {
         fullButton.textContent = document.fullscreenElement ? "Exit full" : "Full";
+        fitDeck();
       });
 
       document.addEventListener("keydown", (event) => {
@@ -2122,12 +1856,6 @@
         } else if (event.key === "End") {
           event.preventDefault();
           setSlide(slides.length - 1);
-        } else if (event.key === " ") {
-          event.preventDefault();
-          toggleTimer();
-        } else if (event.key.toLowerCase() === "n") {
-          event.preventDefault();
-          toggleNotes();
         } else if (event.key.toLowerCase() === "f") {
           event.preventDefault();
           toggleFullscreen();
@@ -2139,13 +1867,11 @@
           keyboardHelp.classList.toggle("open");
         } else if (event.key === "Escape") {
           keyboardHelp.classList.remove("open");
-          notesPanel.classList.remove("open");
-          notesButton.textContent = "Notes";
         }
       });
 
+      fitDeck();
       setSlide(0);
-      renderTimer();
     })();
   </script>
 </body>
