@@ -204,6 +204,113 @@
       line-height: 1.42;
     }
 
+    .position-layout {
+      display: grid;
+      grid-template-columns: 1.45fr .55fr;
+      gap: 26px;
+      align-items: stretch;
+    }
+
+    .position-copy {
+      padding: 3px 0 0;
+    }
+
+    .position-copy h1 {
+      margin-bottom: 14px;
+      font-size: 76px;
+      white-space: normal;
+    }
+
+    .position-statement {
+      max-width: 760px;
+      margin: 0;
+      color: #344258;
+      font-size: 28px;
+      font-weight: 660;
+      line-height: 1.28;
+      letter-spacing: -.025em;
+    }
+
+    .position-statement strong {
+      color: var(--blue-dark);
+    }
+
+    .not-trading-card {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      min-height: 214px;
+      padding: 27px;
+      border-radius: var(--radius-xl);
+      background:
+        radial-gradient(circle at 86% 13%, rgba(255,255,255,.14), transparent 28%),
+        linear-gradient(145deg, #173b9a, #10285f);
+      color: white;
+      box-shadow: 0 20px 45px rgba(23,59,154,.22);
+    }
+
+    .not-trading-card .boundary-label {
+      color: #bcd0ff;
+      font-size: 12px;
+      font-weight: 850;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+    }
+
+    .not-trading-card strong {
+      display: block;
+      margin: 18px 0 8px;
+      font-size: 34px;
+      line-height: 1.04;
+      letter-spacing: -.035em;
+    }
+
+    .not-trading-card p {
+      margin: 0;
+      color: #d7e2ff;
+      font-size: 16px;
+      line-height: 1.42;
+    }
+
+    .comparison-strip {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 13px;
+      margin-top: 26px;
+    }
+
+    .comparison-item {
+      min-height: 110px;
+      padding: 16px 18px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-md);
+      background: rgba(255,255,255,.82);
+    }
+
+    .comparison-item.highlight {
+      border-color: rgba(47,91,211,.38);
+      background: var(--blue-soft);
+    }
+
+    .comparison-item span {
+      display: block;
+      margin-bottom: 8px;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 850;
+      letter-spacing: .07em;
+      text-transform: uppercase;
+    }
+
+    .comparison-item.highlight span { color: var(--blue); }
+
+    .comparison-item strong {
+      display: block;
+      font-size: 19px;
+      line-height: 1.22;
+      letter-spacing: -.015em;
+    }
+
     .lede {
       max-width: 900px;
       margin-bottom: 0;
@@ -322,6 +429,286 @@
       line-height: 1.25;
     }
 
+    .people-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 18px;
+    }
+
+    .person-card {
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-lg);
+      background: white;
+      box-shadow: 0 14px 34px rgba(15,23,42,.07);
+    }
+
+    .person-photo {
+      width: 100%;
+      height: 255px;
+      display: block;
+      object-fit: cover;
+      object-position: center 24%;
+      background: #eef2f7;
+    }
+
+    .person-card:nth-child(3) .person-photo {
+      object-position: center 18%;
+    }
+
+    .person-copy {
+      min-height: 105px;
+      padding: 18px 19px;
+      border-top: 5px solid var(--person-color);
+    }
+
+    .person-copy h3 {
+      margin-bottom: 7px;
+      font-size: 28px;
+      letter-spacing: -.035em;
+    }
+
+    .person-copy p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 15px;
+      font-weight: 700;
+      line-height: 1.32;
+    }
+
+    .delivery-layout {
+      display: grid;
+      grid-template-columns: 1.42fr .58fr;
+      gap: 20px;
+      align-items: stretch;
+    }
+
+    .delivery-flow {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+      padding: 17px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-xl);
+      background: white;
+      box-shadow: 0 14px 34px rgba(15,23,42,.055);
+    }
+
+    .delivery-step {
+      position: relative;
+      min-height: 205px;
+      padding: 19px 17px;
+      border-radius: 16px;
+      background: #f5f7fb;
+    }
+
+    .delivery-step:not(:last-child)::after {
+      content: "→";
+      position: absolute;
+      z-index: 2;
+      top: 50%;
+      right: -17px;
+      width: 24px;
+      color: var(--blue);
+      font-size: 24px;
+      font-weight: 900;
+      line-height: 1;
+      text-align: center;
+      transform: translateY(-50%);
+    }
+
+    .delivery-step .step-index {
+      color: var(--blue);
+      font-size: 12px;
+      font-weight: 900;
+      letter-spacing: .08em;
+    }
+
+    .delivery-step strong {
+      display: block;
+      margin: 24px 0 9px;
+      font-size: 22px;
+      line-height: 1.08;
+      letter-spacing: -.025em;
+    }
+
+    .delivery-step p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 15px;
+      line-height: 1.38;
+    }
+
+    .status-dots {
+      display: flex;
+      gap: 4px;
+      margin-top: 16px;
+    }
+
+    .status-dots i {
+      width: 20%;
+      height: 6px;
+      border-radius: 99px;
+      background: #cbd5e1;
+    }
+
+    .status-dots i:nth-child(2) { background: #7ca5ff; }
+    .status-dots i:nth-child(3) { background: #f2b65e; }
+    .status-dots i:nth-child(4) { background: #55bd91; }
+
+    .ci-evidence {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      min-height: 241px;
+      padding: 24px;
+      border-radius: var(--radius-xl);
+      background: linear-gradient(145deg, #101b34, #14294e);
+      color: white;
+    }
+
+    .ci-evidence .card-kicker { color: #93b2ff; }
+
+    .ci-checks {
+      display: grid;
+      gap: 10px;
+    }
+
+    .ci-check {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 13px 14px;
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 12px;
+      background: rgba(255,255,255,.07);
+      font-size: 15px;
+      font-weight: 760;
+    }
+
+    .ci-check b {
+      color: #58d49b;
+      font-size: 19px;
+    }
+
+    .ci-evidence > p {
+      margin: 15px 0 0;
+      color: #bac8df;
+      font-size: 14px;
+      line-height: 1.4;
+    }
+
+    .team-ribbon {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+      margin-top: 15px;
+    }
+
+    .owner-chip {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      padding: 10px 13px;
+      border: 1px solid var(--line);
+      border-radius: 13px;
+      background: rgba(255,255,255,.8);
+    }
+
+    .owner-chip i {
+      width: 9px;
+      height: 32px;
+      flex: 0 0 auto;
+      border-radius: 99px;
+      background: var(--owner-color);
+    }
+
+    .owner-chip strong {
+      display: block;
+      font-size: 16px;
+    }
+
+    .owner-chip span {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.25;
+    }
+
+    .management-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 21px;
+    }
+
+    .management-card {
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-lg);
+      background: white;
+      box-shadow: 0 14px 34px rgba(15,23,42,.07);
+    }
+
+    .management-shot {
+      width: 100%;
+      height: 238px;
+      display: block;
+      object-fit: cover;
+      object-position: center top;
+      border-bottom: 1px solid var(--line);
+      background: #f4f6f8;
+    }
+
+    .management-copy {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 15px;
+      align-items: start;
+      min-height: 100px;
+      padding: 17px 19px;
+    }
+
+    .management-badge {
+      padding: 6px 9px;
+      border-radius: 8px;
+      background: var(--badge-soft);
+      color: var(--badge-color);
+      font-size: 12px;
+      font-weight: 900;
+      letter-spacing: .06em;
+    }
+
+    .management-copy strong {
+      display: block;
+      margin-bottom: 5px;
+      font-size: 21px;
+      line-height: 1.12;
+    }
+
+    .management-copy p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.38;
+    }
+
+    .management-flow {
+      display: grid;
+      grid-template-columns: repeat(5, auto);
+      justify-content: center;
+      gap: 15px;
+      align-items: center;
+      margin-top: 15px;
+      color: var(--blue-dark);
+      font-size: 14px;
+      font-weight: 800;
+    }
+
+    .management-flow span:nth-child(even) {
+      color: var(--blue);
+      font-size: 19px;
+    }
+
     .problem-card .big-word {
       display: block;
       margin-bottom: 10px;
@@ -329,6 +716,144 @@
       font-size: 38px;
       font-weight: 850;
       letter-spacing: -.04em;
+    }
+
+    .audience-layout {
+      display: grid;
+      grid-template-columns: .72fr 1.28fr;
+      gap: 21px;
+      align-items: stretch;
+    }
+
+    .audience-card {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      min-height: 342px;
+      padding: 30px;
+      border-radius: var(--radius-xl);
+      background:
+        radial-gradient(circle at 85% 16%, rgba(103,142,255,.26), transparent 26%),
+        linear-gradient(150deg, #0f1d3c, #173b77);
+      color: white;
+      box-shadow: 0 20px 46px rgba(15,29,60,.17);
+    }
+
+    .audience-card .card-kicker { color: #9eb8ff; }
+
+    .audience-card strong {
+      display: block;
+      max-width: 340px;
+      margin: 18px 0 14px;
+      font-size: 38px;
+      line-height: 1.02;
+      letter-spacing: -.04em;
+    }
+
+    .audience-card p {
+      max-width: 330px;
+      margin: 0;
+      color: #c9d5ec;
+      font-size: 16px;
+      line-height: 1.42;
+    }
+
+    .audience-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 22px;
+    }
+
+    .audience-tags span {
+      padding: 7px 10px;
+      border: 1px solid rgba(255,255,255,.18);
+      border-radius: 999px;
+      background: rgba(255,255,255,.08);
+      color: #e5ecff;
+      font-size: 12px;
+      font-weight: 750;
+    }
+
+    .need-panel {
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      gap: 12px;
+    }
+
+    .need-heading {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 20px;
+    }
+
+    .need-heading strong {
+      font-size: 20px;
+      letter-spacing: -.02em;
+    }
+
+    .need-heading span {
+      color: var(--muted);
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .need-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .need-item {
+      padding: 19px 20px;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: rgba(255,255,255,.88);
+    }
+
+    .need-item .need-index {
+      color: var(--blue);
+      font-size: 12px;
+      font-weight: 900;
+      letter-spacing: .08em;
+    }
+
+    .need-item strong {
+      display: block;
+      margin: 10px 0 6px;
+      font-size: 20px;
+      line-height: 1.15;
+    }
+
+    .need-item p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.38;
+    }
+
+    .problem-statement {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 14px;
+      align-items: center;
+      padding: 13px 16px;
+      border-radius: 13px;
+      background: #fff2ed;
+      color: #7f3525;
+    }
+
+    .problem-statement b {
+      font-size: 12px;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+
+    .problem-statement span {
+      font-size: 14px;
+      font-weight: 700;
+      line-height: 1.35;
     }
 
     .boundary {
@@ -1272,98 +1797,182 @@
 <body>
   <main class="deck-shell">
     <div class="deck" id="deck" aria-live="polite">
-      <section class="slide active title-slide" aria-label="Title">
-        <header class="slide-head" aria-hidden="true"></header>
+      <section class="slide active title-slide" data-owner="Simon" data-duration="40" style="--owner:#2f5bd3" aria-label="Product positioning">
+        <header class="slide-head">
+          <p class="eyebrow">Product positioning</p>
+        </header>
         <div class="slide-body">
-          <h1>WealthCopilot</h1>
-          <p class="lede">A secure, explainable portfolio tracker with deterministic P&amp;L, resilient market data, and human-controlled AI.</p>
+          <div class="position-layout">
+            <div class="position-copy">
+              <h1>WealthCopilot</h1>
+              <p class="position-statement">A personal investment tracker that <strong>records, calculates and explains</strong> a user&rsquo;s portfolio.</p>
+            </div>
+            <aside class="not-trading-card" aria-label="Product boundary">
+              <span class="boundary-label">Clear product boundary</span>
+              <div>
+                <strong>Not a trading platform.</strong>
+                <p>No order execution, money movement, price prediction or buy / sell advice.</p>
+              </div>
+            </aside>
+          </div>
+          <div class="comparison-strip" aria-label="Comparison with other tools">
+            <article class="comparison-item">
+              <span>Spreadsheets</span>
+              <strong>Flexible, but manual and easy to break</strong>
+            </article>
+            <article class="comparison-item">
+              <span>Brokerage apps</span>
+              <strong>Built to execute trades and show prices</strong>
+            </article>
+            <article class="comparison-item">
+              <span>General AI</span>
+              <strong>Conversational, without verified portfolio records</strong>
+            </article>
+            <article class="comparison-item highlight">
+              <span>WealthCopilot</span>
+              <strong>Verified records, explainable math, controlled AI</strong>
+            </article>
+          </div>
         </div>
         <footer class="slide-foot">
-          <span class="slide-number">01 / 12</span>
+          <span class="slide-number">01 / 13</span>
         </footer>
       </section>
 
-      <section class="slide" data-owner="Simon" data-duration="60" style="--owner:#2f5bd3" aria-label="Team and ownership">
+      <section class="slide" data-owner="Simon" data-duration="35" style="--owner:#2f5bd3" aria-label="Team and ownership">
         <header class="slide-head">
-          <p class="eyebrow">Team &amp; ownership</p>
+          <p class="eyebrow">Our team</p>
         </header>
         <div class="slide-body">
-          <h2>Team Ownership</h2>
-          <div class="four-col">
-            <article class="card team-card" style="--card-accent:#2f5bd3">
-              <span class="card-kicker">Foundation</span>
-              <h3 class="name">Simon</h3>
-              <div class="role">Platform, authentication &amp; security</div>
-              <ul class="clean-list">
-                <li>Spring Boot foundation</li>
-                <li>JWT + BCrypt</li>
-                <li>Per-user isolation</li>
-              </ul>
+          <h2>Four People. Clear Ownership.</h2>
+          <div class="people-grid">
+            <article class="person-card" style="--person-color:#2f5bd3">
+              <img class="person-photo" src="presentation-assets/team/simon.jpg" alt="Simon">
+              <div class="person-copy">
+                <h3>Simon</h3>
+                <p>Platform, authentication &amp; security</p>
+              </div>
             </article>
-            <article class="card team-card" style="--card-accent:#1e8c63">
-              <span class="card-kicker">Domain</span>
-              <h3 class="name">Ezio</h3>
-              <div class="role">Transactions &amp; portfolio engine</div>
-              <ul class="clean-list">
-                <li>BUY / SELL lifecycle</li>
-                <li>Average cost basis</li>
-                <li>Realized / unrealized P&amp;L</li>
-              </ul>
+            <article class="person-card" style="--person-color:#1e8c63">
+              <img class="person-photo" src="presentation-assets/team/ezio.jpg" alt="Ezio">
+              <div class="person-copy">
+                <h3>Ezio</h3>
+                <p>Transactions &amp; portfolio engine</p>
+              </div>
             </article>
-            <article class="card team-card" style="--card-accent:#ba7420">
-              <span class="card-kicker">Reliability</span>
-              <h3 class="name">Tony</h3>
-              <div class="role">Market data, external access &amp; tests</div>
-              <ul class="clean-list">
-                <li>Twelve Data + cache</li>
-                <li>API-key framework</li>
-                <li>Test infrastructure</li>
-              </ul>
+            <article class="person-card" style="--person-color:#ba7420">
+              <img class="person-photo" src="presentation-assets/team/tony.jpg" alt="Tony">
+              <div class="person-copy">
+                <h3>Tony</h3>
+                <p>Market data, external API &amp; testing</p>
+              </div>
             </article>
-            <article class="card team-card" style="--card-accent:#8b5cf6">
-              <span class="card-kicker">Experience</span>
-              <h3 class="name">Jasper</h3>
-              <div class="role">Frontend &amp; AI</div>
-              <ul class="clean-list">
-                <li>React product experience</li>
-                <li>AI transaction draft</li>
-                <li>Portfolio Copilot</li>
-              </ul>
+            <article class="person-card" style="--person-color:#8b5cf6">
+              <img class="person-photo" src="presentation-assets/team/jasper.jpg" alt="Jasper">
+              <div class="person-copy">
+                <h3>Jasper</h3>
+                <p>Frontend &amp; AI experience</p>
+              </div>
             </article>
           </div>
         </div>
         <footer class="slide-foot">
-          <span class="slide-number">02 / 12</span>
+          <span class="slide-number">02 / 13</span>
         </footer>
       </section>
 
-      <section class="slide" data-owner="Simon" data-duration="105" style="--owner:#2f5bd3" aria-label="User problem">
+      <section class="slide" data-owner="Simon" data-duration="40" style="--owner:#2f5bd3" aria-label="Project management and continuous integration">
         <header class="slide-head">
-          <p class="eyebrow">The user problem</p>
+          <p class="eyebrow">Project management &amp; quality</p>
         </header>
         <div class="slide-body">
-          <h2>Trust Concern</h2>
-          <div class="three-col">
-            <article class="card problem-card" style="--card-accent:#c64a64">
-              <span class="big-word">Records</span>
-              <p>Buys, sells, dates and fees often live in notes or spreadsheets, with no timeline validation.</p>
+          <h2>Visible Work. Reviewed Changes.</h2>
+          <div class="management-grid">
+            <article class="management-card">
+              <img class="management-shot" src="presentation-assets/project-management/jira-board.png" alt="WealthCopilot Jira board">
+              <div class="management-copy">
+                <span class="management-badge" style="--badge-color:#2457c5;--badge-soft:#eaf0ff">JIRA</span>
+                <div>
+                  <strong>One shared delivery board</strong>
+                  <p>Priorities, owners and progress move from To Do to Done.</p>
+                </div>
+              </div>
             </article>
-            <article class="card problem-card" style="--card-accent:#ba7420">
-              <span class="big-word">Prices</span>
-              <p>Live quotes can be slow or unavailable, while users still need a stable portfolio view.</p>
-            </article>
-            <article class="card problem-card" style="--card-accent:#8b5cf6">
-              <span class="big-word">Questions</span>
-              <p>Users want plain-language answers, but should not surrender control to an opaque agent.</p>
+            <article class="management-card">
+              <img class="management-shot" src="presentation-assets/project-management/github-actions.png" alt="Passing GitHub Actions checks">
+              <div class="management-copy">
+                <span class="management-badge" style="--badge-color:#18724f;--badge-soft:#e8f7f0">CI</span>
+                <div>
+                  <strong>Automated checks on every PR</strong>
+                  <p>Backend verification and frontend type-check / build must pass.</p>
+                </div>
+              </div>
             </article>
           </div>
-          <div class="boundary">
-            <span>What users need: one explainable source of truth.</span>
-            <span>What we do not build: brokerage, prediction or investment advice.</span>
+          <div class="management-flow" aria-label="Delivery workflow">
+            <b>Jira ticket</b><span>→</span><b>Pull request</b><span>→</span><b>Reviewed merge</b>
           </div>
         </div>
         <footer class="slide-foot">
-          <span class="slide-number">03 / 12</span>
+          <span class="slide-number">03 / 13</span>
+        </footer>
+      </section>
+
+      <section class="slide" data-owner="Simon" data-duration="65" style="--owner:#2f5bd3" aria-label="Target users and needs">
+        <header class="slide-head">
+          <p class="eyebrow">Target users &amp; needs</p>
+        </header>
+        <div class="slide-body">
+          <h2>Clarity for Self-Directed Investors</h2>
+          <div class="audience-layout">
+            <section class="audience-card" aria-label="Primary audience">
+              <div>
+                <span class="card-kicker">Primary audience</span>
+                <strong>Everyday investors managing their own records</strong>
+                <p>People who hold stocks or ETFs and want to understand their portfolio without becoming professional traders.</p>
+              </div>
+              <div class="audience-tags">
+                <span>Personal portfolios</span>
+                <span>Stocks &amp; ETFs</span>
+                <span>USD-first</span>
+              </div>
+            </section>
+            <section class="need-panel" aria-label="User needs and pain points">
+              <div class="need-heading">
+                <strong>What they need</strong>
+                <span>Before choosing what to do next</span>
+              </div>
+              <div class="need-grid">
+                <article class="need-item">
+                  <span class="need-index">01 · RECORDS</span>
+                  <strong>Trust the history</strong>
+                  <p>Buys, sells, dates and fees should stay consistent.</p>
+                </article>
+                <article class="need-item">
+                  <span class="need-index">02 · PERFORMANCE</span>
+                  <strong>Understand the numbers</strong>
+                  <p>Value, cost basis and P&amp;L should be explainable.</p>
+                </article>
+                <article class="need-item">
+                  <span class="need-index">03 · CONTEXT</span>
+                  <strong>Ask in plain language</strong>
+                  <p>Portfolio questions should not require financial formulas.</p>
+                </article>
+                <article class="need-item">
+                  <span class="need-index">04 · CONTROL</span>
+                  <strong>Stay in charge</strong>
+                  <p>AI assistance should not silently change financial records.</p>
+                </article>
+              </div>
+              <div class="problem-statement">
+                <b>The gap</b>
+                <span>Records, prices and explanations are scattered across disconnected tools—creating manual work and low confidence.</span>
+              </div>
+            </section>
+          </div>
+        </div>
+        <footer class="slide-foot">
+          <span class="slide-number">04 / 13</span>
         </footer>
       </section>
 
@@ -1400,7 +2009,7 @@
           </div>
         </div>
         <footer class="slide-foot">
-          <span class="slide-number">04 / 12</span>
+          <span class="slide-number">05 / 13</span>
         </footer>
       </section>
 
@@ -1434,7 +2043,7 @@
           </div>
         </div>
         <footer class="slide-foot">
-          <span class="slide-number">05 / 12</span>
+          <span class="slide-number">06 / 13</span>
         </footer>
       </section>
 
@@ -1465,7 +2074,7 @@
           </div>
         </div>
         <footer class="slide-foot">
-          <span class="slide-number">06 / 12</span>
+          <span class="slide-number">07 / 13</span>
         </footer>
       </section>
 
@@ -1559,7 +2168,7 @@
           </div>
         </div>
         <footer class="slide-foot">
-          <span class="slide-number">07 / 12</span>
+          <span class="slide-number">08 / 13</span>
         </footer>
       </section>
 
@@ -1591,7 +2200,7 @@
           </div>
         </div>
         <footer class="slide-foot">
-          <span class="slide-number">08 / 12</span>
+          <span class="slide-number">09 / 13</span>
         </footer>
       </section>
 
@@ -1625,7 +2234,7 @@
           </div>
         </div>
         <footer class="slide-foot">
-          <span class="slide-number">09 / 12</span>
+          <span class="slide-number">10 / 13</span>
         </footer>
       </section>
 
@@ -1656,7 +2265,7 @@
           </div>
         </div>
         <footer class="slide-foot">
-          <span class="slide-number">10 / 12</span>
+          <span class="slide-number">11 / 13</span>
         </footer>
       </section>
 
@@ -1696,7 +2305,7 @@
           </div>
         </div>
         <footer class="slide-foot">
-          <span class="slide-number">11 / 12</span>
+          <span class="slide-number">12 / 13</span>
         </footer>
       </section>
 
@@ -1748,7 +2357,7 @@
           </div>
         </div>
         <footer class="slide-foot">
-          <span class="slide-number">12 / 12</span>
+          <span class="slide-number">13 / 13</span>
         </footer>
       </section>
     </div>
