@@ -50,7 +50,11 @@ export default function DashboardPage() {
   // Largest absolute day moves first; holdings with no previousClose report a
   // null dayChangePct and sort last rather than being treated as flat.
   const movers = [...all]
-    .sort((a, b) => Math.abs(b.dayChangePct ?? -1) - Math.abs(a.dayChangePct ?? -1))
+    .sort((a, b) => {
+      const av = a.dayChangePct == null ? -Infinity : Math.abs(a.dayChangePct);
+      const bv = b.dayChangePct == null ? -Infinity : Math.abs(b.dayChangePct);
+      return bv - av;
+    })
     .slice(0, 5);
 
   const allocation = all.map((h) => ({ label: h.ticker, value: h.marketValue }));
