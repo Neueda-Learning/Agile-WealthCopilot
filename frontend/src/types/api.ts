@@ -114,7 +114,15 @@ export interface HoldingDetail extends Holding {
 export interface PriceRefreshResult {
   requested: number;
   refreshed: number;
+  /** Symbols the provider was asked for but did not return. */
   failedTickers: string[];
+  /**
+   * Symbols handed to the background refresh because the market-data plan's
+   * per-minute credit allowance was exhausted by this request.
+   */
+  queuedTickers: string[];
+  /** Seconds until more market-data credits are available. 0 when nothing was queued. */
+  retryAfterSeconds: number;
   completedAt: string;
 }
 
