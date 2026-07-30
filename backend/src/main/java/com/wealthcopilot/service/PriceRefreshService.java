@@ -11,6 +11,8 @@ import com.wealthcopilot.repository.PriceCacheRepository;
 import java.time.Clock;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
@@ -30,6 +32,7 @@ public class PriceRefreshService {
     private static final Logger LOGGER = LoggerFactory.getLogger(PriceRefreshService.class);
 
     private final PriceRefreshQueue refreshQueue;
+    private final PriceRefreshBudget refreshBudget;
     private final InstrumentRepository instrumentRepository;
     private final PriceCacheRepository priceCacheRepository;
     private final MarketDataClient marketDataClient;
@@ -43,6 +46,7 @@ public class PriceRefreshService {
 
     public PriceRefreshService(
             PriceRefreshQueue refreshQueue,
+            PriceRefreshBudget refreshBudget,
             InstrumentRepository instrumentRepository,
             PriceCacheRepository priceCacheRepository,
             MarketDataClient marketDataClient,
@@ -50,6 +54,7 @@ public class PriceRefreshService {
             Clock clock
     ) {
         this.refreshQueue = refreshQueue;
+        this.refreshBudget = refreshBudget;
         this.instrumentRepository = instrumentRepository;
         this.priceCacheRepository = priceCacheRepository;
         this.marketDataClient = marketDataClient;
@@ -60,7 +65,13 @@ public class PriceRefreshService {
     @CacheEvict(cacheNames = {"portfolioSummary", "portfolioHoldings"}, allEntries = true)
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void refreshNextBatch() {
-        List<Instrument> instruments = refreshQueue.drain(properties.getCreditsPerMinute());
+        int granted = refreshBudget.tryConsume(properties.getCreditsPerMinute());
+        if (granted == 0) {
+            return;
+        }
+
+        List<Instrument> instruments = refreshQueue.drain(granted);
+        refreshBudget.refund(granted - instruments.size());
         if (instruments.isEmpty()) {
             return;
         }
@@ -78,8 +89,16 @@ public class PriceRefreshService {
     }
 
     /**
-     * User-triggered refresh. Unlike the scheduled queue, this deliberately
-     * refreshes every requested instrument in one blocking provider call.
+     * User-triggered refresh. Ignores the cache TTL entirely and fetches from the
+     * provider in one blocking call, so the response carries prices that were
+     * live at the moment the button was pressed.
+     *
+     * <p>The provider bills one credit per symbol and rejects the entire request
+     * once the per-minute allowance is gone, so a portfolio larger than the
+     * allowance is trimmed to what the plan permits: the stalest symbols are
+     * fetched now, and the remainder are handed to the background queue and
+     * reported back as {@code queuedTickers}. Fetching all of them eagerly is
+     * what produced a 429 and refreshed nothing at all.
      */
     @CacheEvict(cacheNames = {"portfolioSummary", "portfolioHoldings"}, allEntries = true)
     @Transactional(propagation = Propagation.REQUIRES_NEW)
@@ -92,13 +111,61 @@ public class PriceRefreshService {
                 }
             }
         }
-        return refreshInstruments(List.copyOf(unique.values()), false);
+        if (unique.isEmpty()) {
+            return new RefreshResult(0, 0, List.of(), List.of(), 0L, LocalDateTime.now(clock));
+        }
+
+        List<Instrument> ordered = stalestFirst(List.copyOf(unique.values()));
+        int granted = refreshBudget.tryConsume(ordered.size());
+        List<Instrument> attempted = ordered.subList(0, granted);
+        List<Instrument> deferred = ordered.subList(granted, ordered.size());
+
+        deferred.forEach(refreshQueue::enqueue);
+        List<String> queuedTickers = deferred.stream().map(Instrument::getTicker).toList();
+        long retryAfterSeconds = deferred.isEmpty()
+                ? 0L
+                : Math.max(1L, refreshBudget.timeUntilReset().toSeconds());
+        if (!deferred.isEmpty()) {
+            LOGGER.info(
+                    "User refresh trimmed to {} of {} symbols by the market-data credit budget; "
+                            + "the remainder was queued for the background refresh",
+                    granted,
+                    ordered.size());
+        }
+
+        RefreshResult fetched = refreshInstruments(List.copyOf(attempted), false);
+        return new RefreshResult(
+                ordered.size(),
+                fetched.refreshed(),
+                fetched.failedTickers(),
+                queuedTickers,
+                retryAfterSeconds,
+                fetched.completedAt());
+    }
+
+    /**
+     * Orders instruments so the least recently fetched are refreshed first. With a
+     * budget smaller than the portfolio, this lets successive refreshes work
+     * through every holding instead of repeatedly re-fetching the same few.
+     */
+    private List<Instrument> stalestFirst(List<Instrument> instruments) {
+        Map<Long, LocalDateTime> fetchedAt = new HashMap<>();
+        for (PriceCache cached : priceCacheRepository.findAllByInstrumentIdIn(
+                instruments.stream().map(Instrument::getId).toList())) {
+            fetchedAt.put(cached.getInstrumentId(), cached.getFetchedAt());
+        }
+        List<Instrument> ordered = new ArrayList<>(instruments);
+        // Never fetched sorts first: those holdings have no price to show at all.
+        ordered.sort(Comparator.comparing(
+                instrument -> fetchedAt.get(instrument.getId()),
+                Comparator.nullsFirst(Comparator.naturalOrder())));
+        return ordered;
     }
 
     private RefreshResult refreshInstruments(List<Instrument> instruments, boolean schedulerOwned) {
         LocalDateTime completedAt = LocalDateTime.now(clock);
         if (instruments.isEmpty()) {
-            return new RefreshResult(0, 0, List.of(), completedAt);
+            return new RefreshResult(0, 0, List.of(), List.of(), 0L, completedAt);
         }
 
         List<String> failedTickers = new ArrayList<>();
@@ -139,6 +206,8 @@ public class PriceRefreshService {
                 instruments.size(),
                 refreshed,
                 List.copyOf(failedTickers),
+                List.of(),
+                0L,
                 completedAt);
     }
 
@@ -169,10 +238,19 @@ public class PriceRefreshService {
         }
     }
 
+    /**
+     * @param requested          symbols the caller asked for
+     * @param refreshed          symbols whose price was fetched and persisted
+     * @param failedTickers      symbols attempted against the provider that came back empty
+     * @param queuedTickers      symbols deferred to the background queue by the credit budget
+     * @param retryAfterSeconds  seconds until more credits are available, 0 when none were deferred
+     */
     public record RefreshResult(
             int requested,
             int refreshed,
             List<String> failedTickers,
+            List<String> queuedTickers,
+            long retryAfterSeconds,
             LocalDateTime completedAt
     ) {
     }

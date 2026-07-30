@@ -126,7 +126,7 @@ export default function DashboardPage() {
         />
       </Card>
 
-      <div className="grid-2">
+      <div className="grid-2 grid-2--even">
         <Card
           title={t('Top movers', '涨跌幅榜')} subtitle={t('Today', '今日')} flush
           action={

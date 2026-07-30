@@ -29,6 +29,8 @@ public class HoldingPriceRefreshService {
                 result.requested(),
                 result.refreshed(),
                 result.failedTickers(),
+                result.queuedTickers(),
+                result.retryAfterSeconds(),
                 result.completedAt());
     }
 }

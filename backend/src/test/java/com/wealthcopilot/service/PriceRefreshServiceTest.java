@@ -1,13 +1,17 @@
 package com.wealthcopilot.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.wealthcopilot.entity.Instrument;
+import com.wealthcopilot.entity.PriceCache;
 import com.wealthcopilot.marketdata.MarketDataClient;
 import com.wealthcopilot.marketdata.MarketDataClientException;
 import com.wealthcopilot.marketdata.MarketDataProperties;
@@ -41,6 +45,7 @@ class PriceRefreshServiceTest {
     private MarketDataClient marketDataClient;
 
     private PriceRefreshQueue queue;
+    private PriceRefreshBudget budget;
     private PriceRefreshService refreshService;
 
     @BeforeEach
@@ -49,8 +54,10 @@ class PriceRefreshServiceTest {
         MarketDataProperties properties = new MarketDataProperties();
         properties.setCreditsPerMinute(2);
         Clock clock = Clock.fixed(Instant.parse("2026-07-28T12:00:00Z"), ZoneOffset.UTC);
+        budget = new PriceRefreshBudget(properties, clock);
         refreshService = new PriceRefreshService(
                 queue,
+                budget,
                 instrumentRepository,
                 priceCacheRepository,
                 marketDataClient,
@@ -89,26 +96,100 @@ class PriceRefreshServiceTest {
 
     @Test
     void refreshInstrumentsNow_refreshesEveryRequestedInstrumentImmediately() {
+        List<Instrument> instruments = List.of(instrument(1L, "AAPL"), instrument(2L, "MSFT"));
+        when(marketDataClient.fetchQuotes(List.of("AAPL", "MSFT")))
+                .thenReturn(quotes(List.of("AAPL", "MSFT")));
+        stubPersistence(instruments);
+
+        PriceRefreshService.RefreshResult result =
+                refreshService.refreshInstrumentsNow(instruments);
+
+        assertEquals(2, result.requested());
+        assertEquals(2, result.refreshed());
+        assertEquals(List.of(), result.failedTickers());
+        assertEquals(List.of(), result.queuedTickers());
+        assertEquals(0L, result.retryAfterSeconds());
+        verify(marketDataClient).fetchQuotes(List.of("AAPL", "MSFT"));
+        verify(priceCacheRepository, times(2)).save(any());
+    }
+
+    @Test
+    void refreshInstrumentsNow_trimsToTheCreditBudgetInsteadOfFailingTheWholeRequest() {
         List<Instrument> instruments = List.of(
                 instrument(1L, "AAPL"),
                 instrument(2L, "MSFT"),
                 instrument(3L, "NVDA"));
-        when(marketDataClient.fetchQuotes(List.of("AAPL", "MSFT", "NVDA")))
-                .thenReturn(quotes(List.of("AAPL", "MSFT", "NVDA")));
+        when(marketDataClient.fetchQuotes(List.of("AAPL", "MSFT")))
+                .thenReturn(quotes(List.of("AAPL", "MSFT")));
+        stubPersistence(instruments);
+
+        PriceRefreshService.RefreshResult result =
+                refreshService.refreshInstrumentsNow(instruments);
+
+        // The provider bills a credit per symbol and rejects the whole call once the
+        // per-minute allowance is gone, so asking for all three would refresh none.
+        assertEquals(3, result.requested());
+        assertEquals(2, result.refreshed());
+        assertEquals(List.of(), result.failedTickers());
+        assertEquals(List.of("NVDA"), result.queuedTickers());
+        assertTrue(result.retryAfterSeconds() > 0);
+        assertEquals(1, queue.size());
+        verify(marketDataClient).fetchQuotes(List.of("AAPL", "MSFT"));
+    }
+
+    @Test
+    void refreshInstrumentsNow_spendsTheBudgetOnTheLeastRecentlyFetchedSymbols() {
+        List<Instrument> instruments = List.of(
+                instrument(1L, "AAPL"),
+                instrument(2L, "MSFT"),
+                instrument(3L, "NVDA"));
+        // Built before the stubbing call: cachedAt() stubs its own mock.
+        List<PriceCache> cached = List.of(
+                cachedAt(1L, "2026-07-28T11:59:00"),
+                cachedAt(2L, "2026-07-28T10:00:00"),
+                cachedAt(3L, "2026-07-28T09:00:00"));
+        when(priceCacheRepository.findAllByInstrumentIdIn(List.of(1L, 2L, 3L))).thenReturn(cached);
+        when(marketDataClient.fetchQuotes(List.of("NVDA", "MSFT")))
+                .thenReturn(quotes(List.of("NVDA", "MSFT")));
+        stubPersistence(instruments);
+
+        PriceRefreshService.RefreshResult result =
+                refreshService.refreshInstrumentsNow(instruments);
+
+        assertEquals(2, result.refreshed());
+        assertEquals(List.of("AAPL"), result.queuedTickers());
+        verify(marketDataClient).fetchQuotes(List.of("NVDA", "MSFT"));
+    }
+
+    @Test
+    void refreshInstrumentsNow_keepsCachedPricesWhenTheProviderIsUnavailable() {
+        List<Instrument> instruments = List.of(instrument(1L, "AAPL"), instrument(2L, "MSFT"));
+        when(marketDataClient.fetchQuotes(List.of("AAPL", "MSFT")))
+                .thenThrow(new MarketDataClientException("provider unavailable"));
+
+        PriceRefreshService.RefreshResult result =
+                refreshService.refreshInstrumentsNow(instruments);
+
+        assertEquals(2, result.requested());
+        assertEquals(0, result.refreshed());
+        assertEquals(List.of("AAPL", "MSFT"), result.failedTickers());
+        verify(priceCacheRepository, never()).save(any());
+        assertEquals(2, queue.size());
+    }
+
+    private void stubPersistence(List<Instrument> instruments) {
         when(priceCacheRepository.findByInstrumentId(any(Long.class))).thenReturn(Optional.empty());
         when(instrumentRepository.findById(any(Long.class))).thenAnswer(invocation -> {
             Long id = invocation.getArgument(0);
             return Optional.of(instruments.get(id.intValue() - 1));
         });
+    }
 
-        PriceRefreshService.RefreshResult result =
-                refreshService.refreshInstrumentsNow(instruments);
-
-        assertEquals(3, result.requested());
-        assertEquals(3, result.refreshed());
-        assertEquals(List.of(), result.failedTickers());
-        verify(marketDataClient).fetchQuotes(List.of("AAPL", "MSFT", "NVDA"));
-        verify(priceCacheRepository, times(3)).save(any());
+    private PriceCache cachedAt(Long instrumentId, String fetchedAt) {
+        PriceCache cached = mock(PriceCache.class);
+        when(cached.getInstrumentId()).thenReturn(instrumentId);
+        when(cached.getFetchedAt()).thenReturn(LocalDateTime.parse(fetchedAt));
+        return cached;
     }
 
     private Map<String, MarketDataClient.MarketQuote> quotes(List<String> tickers) {

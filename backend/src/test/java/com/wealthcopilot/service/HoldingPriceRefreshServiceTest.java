@@ -36,7 +36,7 @@ class HoldingPriceRefreshServiceTest {
                 .thenReturn(List.of(apple, nvidia));
         when(priceRefreshService.refreshInstrumentsNow(List.of(apple, nvidia)))
                 .thenReturn(new PriceRefreshService.RefreshResult(
-                        2, 1, List.of("NVDA"), completedAt));
+                        2, 1, List.of("NVDA"), List.of(), 0L, completedAt));
 
         PriceRefreshResponse response = service.refreshHeldPrices(7L);
 
