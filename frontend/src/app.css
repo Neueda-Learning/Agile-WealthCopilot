@@ -15,6 +15,9 @@ html, body, #root { height: 100%; }
 .spacer { flex: 1; }
 
 .grid-2 { display: grid; grid-template-columns: 2fr 1fr; gap: var(--section-gap); }
+/* Equal halves, for rows where the right-hand card carries a chart rather than
+   a summary and needs the same room as the table beside it. */
+.grid-2--even { grid-template-columns: 1fr 1fr; }
 .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: var(--space-5); }
 
 @media (max-width: 900px) {
@@ -127,7 +130,41 @@ html, body, #root { height: 100%; }
 .dv-row__val.is-loss, .dv-fall__val.is-loss { color: var(--text-loss); }
 .dv-fall__val.is-total { color: var(--text-secondary); }
 
-/* Waterfall — today's change by holding */
+/* Waterfall — today's change by holding.
+   Every holding gets a column, so a wide portfolio outgrows the card long
+   before it outgrows the data. The plot keeps each column legible and scrolls
+   sideways inside this box instead; the page itself must never scroll. */
+.dv-fall-scroll {
+  /* Narrowest a column may get before scrolling starts — enough for a ticker
+     and a signed value at 11px. The waterfall reads it for its track sizing. */
+  --dv-col-min: 64px;
+  overflow-x: auto;
+  /* One minmax(0, …) track. A scroll container still reports its content's
+     min-content width to its ancestors, so without this floor the widened plot
+     would stretch the card and scroll the whole page sideways instead. */
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  /* `auto` on one axis would compute `auto` on the other too; pinning it to
+     hidden keeps a second, pointless scrollbar from appearing beside the
+     horizontal one. Nothing is drawn outside the plot's own height. */
+  overflow-y: hidden;
+  /* macOS hides overlay scrollbars until something moves, which leaves no hint
+     that there is more chart to the right — so this one is always drawn. */
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-strong) transparent;
+}
+.dv-fall-scroll::-webkit-scrollbar { height: 8px; }
+.dv-fall-scroll::-webkit-scrollbar-track { background: transparent; }
+.dv-fall-scroll::-webkit-scrollbar-thumb {
+  background: var(--border-strong); border-radius: var(--radius-pill);
+}
+.dv-fall-scroll::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+/* On a phone the roomier minimum would make even a three-holding portfolio
+   scroll by a few pixels, which is worse than a slightly tighter column. */
+@media (max-width: 600px) {
+  .dv-fall-scroll { --dv-col-min: 52px; }
+}
+
 .dv-fall {
   position: relative; display: grid; gap: var(--space-3);
   height: 240px; margin-top: var(--space-6);
@@ -146,10 +183,6 @@ html, body, #root { height: 100%; }
 .dv-fall__col.is-active .dv-fall__bar { filter: brightness(0.92); }
 .dv-fall__bar {
   position: absolute; left: 12%; right: 12%; min-height: 2px;
-}
-.dv-fall__link {
-  position: absolute; right: calc(-1 * var(--space-3)); width: var(--space-3);
-  height: 1px; background: var(--border-default);
 }
 .dv-fall__val {
   position: absolute; left: 0; right: 0; text-align: center;
@@ -171,7 +204,11 @@ html, body, #root { height: 100%; }
   font-size: var(--fs-sm); box-shadow: var(--shadow-md, 0 6px 20px rgba(11,18,32,.22));
   pointer-events: none;
 }
-.dv-tip--col { top: 0; }
+/* The waterfall's tooltip sits inside the plot rather than above it: its
+   container scrolls, and a scroll container clips whatever leaves its box. */
+.dv-tip--col { top: var(--space-3); transform: translate(-50%, 0); }
+.dv-tip--col.is-start { left: 0; transform: none; }
+.dv-tip--col.is-end { left: auto; right: 0; transform: none; }
 .dv-tip__row { display: flex; justify-content: space-between; gap: var(--space-4); opacity: .85; }
 .dv-tip__hint { margin-top: var(--space-2); opacity: .6; font-size: 11px; }
 
